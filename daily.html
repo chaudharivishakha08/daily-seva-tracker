@@ -8,126 +8,27 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
-    .page-body {
-      flex: 1;
-      padding: 24px 20px 40px;
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    .filter-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-    .filter-row input[type="date"] {
-      padding: 9px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      font-family: "Inter", sans-serif;
-      font-size: 0.88rem;
-      background: white;
-      outline: none;
-      transition: border-color 0.18s;
-      color: var(--text-dark);
-    }
+    .page-body { flex: 1; padding: 24px 20px 40px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-row input[type="date"] { padding: 9px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: "Inter", sans-serif; font-size: 0.88rem; background: white; outline: none; transition: border-color 0.18s; color: var(--text-dark); }
     .filter-row input[type="date"]:focus { border-color: var(--saffron); }
-    .total-pill {
-      margin-left: auto;
-      padding: 6px 14px;
-      background: var(--saffron-bg);
-      border: 1px solid var(--saffron-light);
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text-mid);
-    }
-    .opt-summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 14px;
-      margin-bottom: 28px;
-    }
-    .opt-summary-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1.5px solid var(--border);
-      padding: 18px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transition: all 0.18s;
-      cursor: default;
-      box-shadow: var(--shadow-sm);
-    }
+    .total-pill { margin-left: auto; padding: 6px 14px; background: var(--saffron-bg); border: 1px solid var(--saffron-light); border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--text-mid); }
+    .opt-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .opt-summary-card { background: var(--white); border-radius: var(--r-lg); border: 1.5px solid var(--border); padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; transition: all 0.18s; cursor: default; box-shadow: var(--shadow-sm); }
     .opt-summary-card:hover { border-color: var(--saffron-light); box-shadow: var(--shadow); transform: translateY(-2px); }
     .osc-top { display: flex; align-items: center; justify-content: space-between; }
-    .osc-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
-      color: white;
-      font-weight: 800;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .osc-badge { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--saffron), var(--saffron-dark)); color: white; font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
     .osc-count { font-size: 2rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
-    .osc-label {
-      font-family: "Tiro Devanagari Marathi", serif;
-      font-size: 0.78rem;
-      color: var(--text-light);
-      line-height: 1.4;
-    }
+    .osc-label { font-family: "Tiro Devanagari Marathi", serif; font-size: 0.78rem; color: var(--text-light); line-height: 1.4; }
     .osc-bar-wrap { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
     .osc-bar { height: 100%; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; transition: width 0.6s ease; }
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 20px;
-      align-items: start;
-    }
-    @media (max-width: 860px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
-    .section-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-    }
-    .section-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .section-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text-mid);
-    }
-    .opt-group-header td {
-      background: var(--saffron-bg);
-      padding: 8px 14px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      color: var(--saffron-dark);
-      letter-spacing: 0.3px;
-    }
-    .chart-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
-    }
+    .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+    @media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
+    .section-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .section-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); }
+    .opt-group-header td { background: var(--saffron-bg); padding: 8px 14px; font-weight: 700; font-size: 0.8rem; color: var(--saffron-dark); letter-spacing: 0.3px; }
+    .chart-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-sm); }
     .chart-card .section-title { margin-bottom: 16px; }
     .chart-canvas-wrap { max-width: 260px; margin: 0 auto; }
     .state { text-align: center; padding: 40px 20px; color: var(--text-light); }
@@ -145,7 +46,7 @@
     <div class="filter-row">
       <span style="font-size:0.85rem;font-weight:600;color:var(--text-mid);">📅 दिनांक:</span>
       <input type="date" id="dateInput"/>
-      <button class="btn btn-primary btn-sm" onclick="load()">पहा</button>
+      <button class="btn btn-primary btn-sm" id="loadBtn">पहा</button>
       <span class="total-pill" id="totalPill" style="display:none;">👥 <span id="totalNum">0</span> responses</span>
     </div>
 
@@ -184,10 +85,12 @@
 
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
-  <script>
-    let pieChart = null;
+  <script type="module">
+    import { getResponsesByDate } from "./firebase-client.js";
 
+    let pieChart = null;
     document.getElementById("dateInput").value = getTodayISO();
+    document.getElementById("loadBtn").addEventListener("click", load);
     window.addEventListener("DOMContentLoaded", load);
 
     async function load() {
@@ -216,31 +119,30 @@
       summaryGrid.innerHTML = "";
       tbody.innerHTML = "";
 
-      CONFIG.SEVA_OPTIONS.forEach(o => {
-        counts[o.id] = [];
+      CONFIG.SEVA_OPTIONS.forEach(opt => {
+        counts[opt.id] = [];
       });
 
-      rows.forEach(r => {
-        const opt = r.selectedOption;
-        if (!counts[opt]) counts[opt] = [];
-        counts[opt].push(r.studentName);
+      rows.forEach(row => {
+        if (!counts[row.selectedOption]) counts[row.selectedOption] = [];
+        counts[row.selectedOption].push(row.studentName);
       });
 
       const total = rows.length;
       document.getElementById("totalNum").textContent = total;
       document.getElementById("totalPill").style.display = total ? "inline-flex" : "none";
 
-      CONFIG.SEVA_OPTIONS.forEach(o => {
-        const n = (counts[o.id] || []).length;
+      CONFIG.SEVA_OPTIONS.forEach(opt => {
+        const n = (counts[opt.id] || []).length;
         const pct = total ? Math.round((n / total) * 100) : 0;
         const card = document.createElement("div");
         card.className = "opt-summary-card";
         card.innerHTML = `
           <div class="osc-top">
-            <div class="osc-badge">${o.id}</div>
+            <div class="osc-badge">${opt.id}</div>
             <div class="osc-count">${n}</div>
           </div>
-          <div class="osc-label font-marathi">${o.text}</div>
+          <div class="osc-label font-marathi">${opt.text}</div>
           <div class="osc-bar-wrap"><div class="osc-bar" style="width:${pct}%"></div></div>
         `;
         summaryGrid.appendChild(card);
@@ -260,13 +162,13 @@
       mainGrid.style.display = "grid";
 
       let serial = 0;
-      CONFIG.SEVA_OPTIONS.forEach(o => {
-        const students = counts[o.id] || [];
+      CONFIG.SEVA_OPTIONS.forEach(opt => {
+        const students = counts[opt.id] || [];
         if (!students.length) return;
 
         const hdr = document.createElement("tr");
         hdr.className = "opt-group-header";
-        hdr.innerHTML = `<td colspan="4">पर्याय ${o.id} - ${o.text} (${students.length})</td>`;
+        hdr.innerHTML = `<td colspan="4">पर्याय ${opt.id} - ${opt.text} (${students.length})</td>`;
         tbody.appendChild(hdr);
 
         students.forEach(name => {
@@ -275,24 +177,21 @@
           tr.innerHTML = `
             <td style="color:var(--text-light);font-size:0.82rem;">${serial}</td>
             <td style="font-weight:500;">🧑 ${name}</td>
-            <td><span class="badge badge-${o.id}">${o.id}</span></td>
-            <td class="font-marathi" style="font-size:0.85rem;color:var(--text-mid);">${o.text}</td>
+            <td><span class="badge badge-${opt.id}">${opt.id}</span></td>
+            <td class="font-marathi" style="font-size:0.85rem;color:var(--text-mid);">${opt.text}</td>
           `;
           tbody.appendChild(tr);
         });
       });
 
-      if (pieChart) {
-        pieChart.destroy();
-      }
+      if (pieChart) pieChart.destroy();
 
-      const canvas = document.getElementById("pieCanvas");
-      pieChart = new Chart(canvas, {
+      pieChart = new Chart(document.getElementById("pieCanvas"), {
         type: "doughnut",
         data: {
-          labels: CONFIG.SEVA_OPTIONS.map(o => o.id),
+          labels: CONFIG.SEVA_OPTIONS.map(opt => opt.id),
           datasets: [{
-            data: CONFIG.SEVA_OPTIONS.map(o => (counts[o.id] || []).length),
+            data: CONFIG.SEVA_OPTIONS.map(opt => (counts[opt.id] || []).length),
             backgroundColor: ["#F97316", "#16A34A", "#3B82F6", "#EC4899", "#6B7280"],
             borderColor: "#fff",
             borderWidth: 3,

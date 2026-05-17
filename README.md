@@ -1,6 +1,6 @@
 # Shri Swami Samarth - Seva Poll App
 
-This app now uses a shared `data.json` file through a small Node.js server, so all users who open the app through that server can see the same students and responses.
+This project now uses Firebase Cloud Firestore for shared storage, so all users can see the same students and responses.
 
 ## Files
 
@@ -9,47 +9,57 @@ seva-tracker/
 |-- add-student.html
 |-- config.js
 |-- daily.html
-|-- data.json
+|-- firebase-client.js
 |-- index.html
-|-- package.json
 |-- poll.html
 |-- results.html
-|-- server.js
 |-- style.css
 `-- README.md
 ```
 
-## How it works
+## Firebase setup
 
-- `server.js` serves the HTML files and exposes API endpoints.
-- `data.json` stores:
-  - `extraStudents`
-  - `responses`
-- Every user sees the same data as long as they open the app from the same running server.
+1. Create a Firebase project in the Firebase console.
+2. Add a Web app to that project.
+3. Enable Cloud Firestore.
+4. Copy your Firebase web app config and paste it into [config.js](/C:/Users/Vishakha/OneDrive/Desktop/seva-tracker/config.js).
 
-## Run the app locally
+Official docs used:
+- [Add Firebase to your JavaScript project](https://firebase.google.com/docs/web/setup)
+- [Alternative ways to add Firebase to your JavaScript project](https://firebase.google.com/docs/web/alt-setup)
+- [Get started with Cloud Firestore](https://firebase.google.com/docs/firestore/quickstart)
 
-1. Open a terminal in this folder.
-2. Run:
+## Firestore data model
 
-```bash
-npm start
+- Document: `app/metadata`
+  - field: `extraStudents` array
+- Collection: `responses`
+  - one document per student per date
+  - fields: `date`, `studentName`, `question`, `selectedOption`, `optionText`, `timestamp`
+
+## Suggested Firestore rules for initial testing
+
+Use test mode only while setting up. After that, lock it down.
+
+For quick setup, you can start with:
+
+```text
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000)
+## Hosting
 
-## Shared storage behavior
-
-- One student can have one response per day.
-- If the same student submits again on the same date, the record is updated.
-- Added students are saved in `data.json` and become visible to all users.
+This is now a static app, so you can host it for free on services like GitHub Pages, Firebase Hosting, Netlify, or Vercel.
 
 ## Important
 
-- Users must open the app through the Node server, not by double-clicking `index.html`.
-- If you want other devices on the same network to use it, open the server machine's IP on port `3000`.
-
-## Render deployment note
-
-For Render, set `DATA_DIR=/var/data` and attach a persistent disk mounted at `/var/data`.
-That keeps `data.json` safe across restarts and redeploys.
+- `config.js` must contain your real Firebase config.
+- Firestore must be enabled in your Firebase project.
+- For production, update Firestore security rules instead of leaving them open.

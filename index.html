@@ -6,177 +6,27 @@
   <title>श्री स्वामी समर्थ</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .login-card {
-      background: var(--white);
-      border-radius: 24px;
-      padding: 48px 40px 40px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border);
-      width: 100%;
-      max-width: 400px;
-      animation: up 0.4s ease both;
-    }
-
-    @keyframes up {
-      from {
-        opacity: 0;
-        transform: translateY(18px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .logo {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-
-    .logo h1 {
-      font-family: "Tiro Devanagari Marathi", serif;
-      font-size: 2.5rem;
-      color: var(--saffron);
-    }
-
-    .logo .bar {
-      width: 50px;
-      height: 3px;
-      background: linear-gradient(90deg, var(--saffron-light), var(--saffron));
-      border-radius: 4px;
-      margin: 12px auto 0;
-    }
-
-    .btn-primary {
-      width: 100%;
-      margin-top: 4px;
-    }
-
-    .admin-links {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-
-    .admin-links a {
-      font-size: 0.78rem;
-      color: var(--text-light);
-      text-decoration: none;
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      transition: all 0.15s;
-    }
-
-    .admin-links a:hover {
-      background: var(--saffron-bg);
-      color: var(--saffron);
-      border-color: var(--saffron-light);
-    }
-
-    .already-note {
-      margin-top: 12px;
-      padding: 10px 14px;
-      background: var(--success-bg);
-      border: 1px solid #86EFAC;
-      border-radius: var(--r-sm);
-      font-size: 0.83rem;
-      color: var(--success);
-      font-weight: 500;
-      display: none;
-      text-align: center;
-    }
-
-    .password-wrap {
-      display: none;
-      margin-bottom: 4px;
-      animation: fadeIn 0.25s ease both;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .password-wrap label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-mid);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .pw-input-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .pw-input-row input {
-      flex: 1;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      font-family: "Inter", sans-serif;
-      font-size: 0.93rem;
-      color: var(--text-dark);
-      background: var(--cream);
-      outline: none;
-      transition: border-color 0.18s;
-    }
-
-    .pw-input-row input:focus {
-      border-color: var(--saffron);
-      background: white;
-    }
-
-    .pw-input-row input.error {
-      border-color: #DC2626;
-      background: #FEF2F2;
-    }
-
-    .pw-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.1rem;
-      padding: 8px;
-      color: var(--text-light);
-      border-radius: var(--r-sm);
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
-
-    .pw-toggle:hover {
-      background: var(--saffron-bg);
-      color: var(--saffron);
-    }
-
-    .pw-error {
-      font-size: 0.78rem;
-      color: #DC2626;
-      font-weight: 500;
-      margin-top: 6px;
-      display: none;
-    }
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .login-card { background: var(--white); border-radius: 24px; padding: 48px 40px 40px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); width: 100%; max-width: 400px; animation: up 0.4s ease both; }
+    @keyframes up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .logo { text-align: center; margin-bottom: 36px; }
+    .logo h1 { font-family: "Tiro Devanagari Marathi", serif; font-size: 2.5rem; color: var(--saffron); }
+    .logo .bar { width: 50px; height: 3px; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; margin: 12px auto 0; }
+    .btn-primary { width: 100%; margin-top: 4px; }
+    .admin-links { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+    .admin-links a { font-size: 0.78rem; color: var(--text-light); text-decoration: none; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); transition: all 0.15s; }
+    .admin-links a:hover { background: var(--saffron-bg); color: var(--saffron); border-color: var(--saffron-light); }
+    .already-note { margin-top: 12px; padding: 10px 14px; background: var(--success-bg); border: 1px solid #86EFAC; border-radius: var(--r-sm); font-size: 0.83rem; color: var(--success); font-weight: 500; display: none; text-align: center; }
+    .password-wrap { display: none; margin-bottom: 4px; animation: fadeIn 0.25s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .password-wrap label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .pw-input-row { display: flex; gap: 8px; align-items: center; }
+    .pw-input-row input { flex: 1; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: "Inter", sans-serif; font-size: 0.93rem; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color 0.18s; }
+    .pw-input-row input:focus { border-color: var(--saffron); background: white; }
+    .pw-input-row input.error { border-color: #DC2626; background: #FEF2F2; }
+    .pw-toggle { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 8px; color: var(--text-light); border-radius: var(--r-sm); transition: all 0.15s; flex-shrink: 0; }
+    .pw-toggle:hover { background: var(--saffron-bg); color: var(--saffron); }
+    .pw-error { font-size: 0.78rem; color: #DC2626; font-weight: 500; margin-top: 6px; display: none; }
   </style>
 </head>
 <body>
@@ -199,15 +49,15 @@
     <div class="password-wrap" id="passwordWrap">
       <label>पासवर्ड / Password</label>
       <div class="pw-input-row">
-        <input type="password" id="pwInput" placeholder="पासवर्ड टाका..." oninput="onPwInput()" onkeydown="if(event.key==='Enter')go()" />
-        <button class="pw-toggle" id="pwToggle" onclick="togglePw()" type="button" title="Show/Hide">👁</button>
+        <input type="password" id="pwInput" placeholder="पासवर्ड टाका..." />
+        <button class="pw-toggle" id="pwToggle" type="button" title="Show/Hide">👁</button>
       </div>
       <div class="pw-error" id="pwError">❌ चुकीचा पासवर्ड</div>
     </div>
 
     <div class="already-note" id="alreadyNote">✓ आपण आज आधीच उत्तर दिले आहे</div>
 
-    <button class="btn btn-primary" id="enterBtn" disabled onclick="go()">
+    <button class="btn btn-primary" id="enterBtn" disabled>
       पुढे जा →
     </button>
 
@@ -220,16 +70,25 @@
 
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
-  <script>
-    const ADMIN_PASSWORD = "ShreeSwamiSamarth@121";
+  <script type="module">
+    import { getStudents, hasSubmitted } from "./firebase-client.js";
 
+    const ADMIN_PASSWORD = "ShreeSwamiSamarth@121";
     const sel = document.getElementById("studentSelect");
     const btn = document.getElementById("enterBtn");
     const pwWrap = document.getElementById("passwordWrap");
     const pwInput = document.getElementById("pwInput");
     const pwError = document.getElementById("pwError");
+    const pwToggle = document.getElementById("pwToggle");
 
     window.addEventListener("DOMContentLoaded", initPage);
+    sel.addEventListener("change", onStudentChange);
+    pwInput.addEventListener("input", onPwInput);
+    pwInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") go();
+    });
+    btn.addEventListener("click", go);
+    pwToggle.addEventListener("click", togglePw);
 
     async function initPage() {
       try {
@@ -245,7 +104,7 @@
       }
     }
 
-    sel.addEventListener("change", async () => {
+    async function onStudentChange() {
       const name = sel.value;
       const note = document.getElementById("alreadyNote");
       const adminLinks = document.getElementById("adminLinks");
@@ -255,6 +114,7 @@
       pwInput.classList.remove("error");
       pwError.style.display = "none";
       adminLinks.style.display = "none";
+      sessionStorage.removeItem("currentStudent");
 
       if (!name) {
         btn.disabled = true;
@@ -262,8 +122,7 @@
         return;
       }
 
-      const adminSelected = CONFIG.ADMINS.includes(name);
-      if (adminSelected) {
+      if (CONFIG.ADMINS.includes(name)) {
         pwWrap.style.display = "block";
         pwInput.focus();
         btn.disabled = true;
@@ -280,7 +139,7 @@
         showToast("Submission status तपासता आला नाही", "error");
         btn.disabled = true;
       }
-    });
+    }
 
     function onPwInput() {
       const name = sel.value;
@@ -301,7 +160,7 @@
 
     function togglePw() {
       pwInput.type = pwInput.type === "password" ? "text" : "password";
-      document.getElementById("pwToggle").textContent = pwInput.type === "password" ? "👁" : "🙈";
+      pwToggle.textContent = pwInput.type === "password" ? "👁" : "🙈";
     }
 
     function go() {

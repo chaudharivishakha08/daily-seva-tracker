@@ -7,139 +7,37 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
-    .page-body {
-      flex: 1;
-      padding: 24px 20px 40px;
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    .filter-bar {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-      box-shadow: var(--shadow-sm);
-    }
+    .page-body { flex: 1; padding: 24px 20px 40px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .filter-bar { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 18px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
     .filter-group { display: flex; align-items: center; gap: 8px; }
     .filter-group label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); white-space: nowrap; }
-    .filter-group input[type="date"] {
-      padding: 8px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      font-family: "Inter", sans-serif;
-      font-size: 0.85rem;
-      color: var(--text-dark);
-      background: var(--cream);
-      outline: none;
-    }
+    .filter-group input[type="date"] { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: "Inter", sans-serif; font-size: 0.85rem; color: var(--text-dark); background: var(--cream); outline: none; }
     .filter-group input[type="date"]:focus { border-color: var(--saffron); }
     .sep { color: var(--border); font-size: 1.2rem; }
-    .tabs-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+    .tabs-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
     .student-view { display: flex; flex-direction: column; gap: 16px; }
     .option-view { display: flex; flex-direction: column; gap: 16px; }
-    .table-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .table-toolbar {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .table-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .table-toolbar { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .tbl-title { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); }
     .search-box { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
-    .search-box input {
-      width: 100%;
-      padding: 8px 12px 8px 32px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      font-size: 0.85rem;
-      font-family: "Inter", sans-serif;
-      outline: none;
-      background: var(--cream);
-      color: var(--text-dark);
-    }
+    .search-box input { width: 100%; padding: 8px 12px 8px 32px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 0.85rem; font-family: "Inter", sans-serif; outline: none; background: var(--cream); color: var(--text-dark); }
     .search-box input:focus { border-color: var(--saffron); }
-    .search-icon {
-      position: absolute;
-      left: 9px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.85rem;
-      color: var(--text-light);
-      pointer-events: none;
-    }
-    .opt-detail-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      padding: 20px 22px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .odc-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      min-width: 70px;
-    }
-    .odc-badge {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
-      color: white;
-      font-weight: 800;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: var(--text-light); pointer-events: none; }
+    .opt-detail-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 20px 22px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 20px; }
+    .odc-left { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 70px; }
+    .odc-badge { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, var(--saffron), var(--saffron-dark)); color: white; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
     .odc-count { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
     .odc-label { font-size: 0.72rem; color: var(--text-light); font-weight: 600; }
     .odc-right { flex: 1; }
     .odc-text { font-family: "Tiro Devanagari Marathi", serif; font-size: 1rem; color: var(--text-dark); line-height: 1.5; margin-bottom: 8px; }
     .odc-names { display: flex; gap: 6px; flex-wrap: wrap; }
-    .name-chip {
-      padding: 3px 10px;
-      background: var(--saffron-bg);
-      border: 1px solid var(--saffron-light);
-      border-radius: 20px;
-      font-size: 0.75rem;
-      color: var(--text-mid);
-      font-weight: 500;
-    }
+    .name-chip { padding: 3px 10px; background: var(--saffron-bg); border: 1px solid var(--saffron-light); border-radius: 20px; font-size: 0.75rem; color: var(--text-mid); font-weight: 500; }
     .odc-bar-wrap { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 10px; }
     .odc-bar { height: 100%; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; }
     .state { text-align: center; padding: 40px 20px; color: var(--text-light); }
     .state span { font-size: 2rem; display: block; margin-bottom: 8px; }
-    .denied {
-      display: none;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--danger);
-    }
+    .denied { display: none; text-align: center; padding: 60px 20px; color: var(--danger); }
     .denied span { font-size: 3rem; display: block; margin-bottom: 12px; }
   </style>
 </head>
@@ -168,7 +66,7 @@
           <label>TO</label>
           <input type="date" id="toDate"/>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="load()">Load</button>
+        <button class="btn btn-primary btn-sm" id="loadBtn">Load</button>
         <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
           <span style="font-size:0.82rem;color:var(--text-light);font-weight:600;" id="rangeInfo"></span>
         </div>
@@ -176,8 +74,8 @@
 
       <div class="tabs-row">
         <div class="tabs">
-          <button class="tab active" id="tabStudent" onclick="switchTab('student')">👤 Student Specific</button>
-          <button class="tab" id="tabOption" onclick="switchTab('option')">📊 Option Specific</button>
+          <button class="tab active" id="tabStudent">👤 Student Specific</button>
+          <button class="tab" id="tabOption">📊 Option Specific</button>
         </div>
         <span style="font-size:0.82rem;color:var(--text-light);" id="totalInfo"></span>
       </div>
@@ -188,7 +86,7 @@
             <span class="tbl-title">प्रत्येक विद्यार्थ्याची निवड</span>
             <div class="search-box">
               <span class="search-icon">🔍</span>
-              <input type="text" id="searchInput" placeholder="नाव शोधा..." oninput="filterStudents()"/>
+              <input type="text" id="searchInput" placeholder="नाव शोधा..."/>
             </div>
           </div>
           <div class="tbl-wrap" style="border-radius:0;border:none;">
@@ -223,12 +121,19 @@
 
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
-  <script>
+  <script type="module">
+    import { getResponsesByRange } from "./firebase-client.js";
+
     let currentTab = "student";
     let allRows = [];
     let studentMap = {};
     let optionMap = {};
     let studentRows = [];
+
+    document.getElementById("loadBtn").addEventListener("click", load);
+    document.getElementById("tabStudent").addEventListener("click", () => switchTab("student"));
+    document.getElementById("tabOption").addEventListener("click", () => switchTab("option"));
+    document.getElementById("searchInput").addEventListener("input", filterStudents);
 
     window.addEventListener("DOMContentLoaded", () => {
       if (!isAdmin()) {
@@ -277,17 +182,17 @@
     function processData(rows) {
       studentMap = {};
       optionMap = {};
-      CONFIG.SEVA_OPTIONS.forEach(o => {
-        optionMap[o.id] = [];
+      CONFIG.SEVA_OPTIONS.forEach(opt => {
+        optionMap[opt.id] = [];
       });
 
-      rows.forEach(r => {
-        const name = r.studentName;
-        const opt = r.selectedOption;
+      rows.forEach(row => {
+        const name = row.studentName;
+        const opt = row.selectedOption;
         if (!studentMap[name]) {
           studentMap[name] = { total: 0 };
-          CONFIG.SEVA_OPTIONS.forEach(o => {
-            studentMap[name][o.id] = 0;
+          CONFIG.SEVA_OPTIONS.forEach(entry => {
+            studentMap[name][entry.id] = 0;
           });
         }
         studentMap[name][opt] = (studentMap[name][opt] || 0) + 1;
@@ -315,12 +220,12 @@
       }
       emEl.style.display = "none";
 
-      rows.forEach(([name, counts], i) => {
+      rows.forEach(([name, counts], index) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td style="color:var(--text-light);font-size:0.82rem;">${i + 1}</td>
-          <td style="font-weight:600;">${name}</td>
-          ${CONFIG.SEVA_OPTIONS.map(o => `<td><span class="badge badge-${o.id}" style="${counts[o.id] ? "" : "opacity:0.3;"}">${counts[o.id] || 0}</span></td>`).join("")}
+          <td style="color:var(--text-light);font-size:0.82rem;">${index + 1}</td>
+          <td style="font-weight:600;"> ${name}</td>
+          ${CONFIG.SEVA_OPTIONS.map(opt => `<td><span class="badge badge-${opt.id}" style="${counts[opt.id] ? "" : "opacity:0.3;"}">${counts[opt.id] || 0}</span></td>`).join("")}
           <td style="font-weight:700;color:var(--saffron-dark);">${counts.total}</td>
         `;
         tbody.appendChild(tr);
@@ -344,9 +249,9 @@
       }
       emEl.style.display = "none";
 
-      CONFIG.SEVA_OPTIONS.forEach(o => {
-        const names = [...new Set(optionMap[o.id] || [])];
-        const count = (optionMap[o.id] || []).length;
+      CONFIG.SEVA_OPTIONS.forEach(opt => {
+        const names = [...new Set(optionMap[opt.id] || [])];
+        const count = (optionMap[opt.id] || []).length;
         const pct = allRows.length ? Math.round((count / allRows.length) * 100) : 0;
 
         const card = document.createElement("div");
@@ -354,13 +259,13 @@
         card.style.marginBottom = "12px";
         card.innerHTML = `
           <div class="odc-left">
-            <div class="odc-badge">${o.id}</div>
+            <div class="odc-badge">${opt.id}</div>
             <div class="odc-count">${count}</div>
             <div class="odc-label">${pct}%</div>
           </div>
           <div class="odc-right">
-            <div class="odc-text">${o.text}</div>
-            <div class="odc-names">${names.map(n => `<span class="name-chip"> ${n}</span>`).join("")}</div>
+            <div class="odc-text">${opt.text}</div>
+            <div class="odc-names">${names.map(name => `<span class="name-chip"> ${name}</span>`).join("")}</div>
             <div class="odc-bar-wrap"><div class="odc-bar" style="width:${pct}%"></div></div>
           </div>
         `;

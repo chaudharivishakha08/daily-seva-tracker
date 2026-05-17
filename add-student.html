@@ -7,102 +7,26 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
-    .page-body {
-      flex: 1;
-      padding: 28px 20px 40px;
-      max-width: 700px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-    @media (max-width: 600px) {
-      .two-col { grid-template-columns: 1fr; }
-    }
-    .add-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      padding: 24px 22px;
-      box-shadow: var(--shadow-sm);
-    }
-    .card-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text-mid);
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .add-card input[type="text"] {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      font-family: "Inter", sans-serif;
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      background: var(--cream);
-      outline: none;
-      margin-bottom: 12px;
-      transition: border-color 0.18s;
-    }
+    .page-body { flex: 1; padding: 28px 20px 40px; max-width: 700px; margin: 0 auto; width: 100%; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+    .add-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 24px 22px; box-shadow: var(--shadow-sm); }
+    .card-title { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+    .add-card input[type="text"] { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: "Inter", sans-serif; font-size: 0.95rem; color: var(--text-dark); background: var(--cream); outline: none; margin-bottom: 12px; transition: border-color 0.18s; }
     .add-card input[type="text"]:focus { border-color: var(--saffron); background: white; }
-    .list-card {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-    }
-    .list-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .list-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .list-header { padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .student-list { max-height: 460px; overflow-y: auto; }
-    .student-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 11px 18px;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.12s;
-    }
+    .student-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 18px; border-bottom: 1px solid var(--border); transition: background 0.12s; }
     .student-item:last-child { border-bottom: none; }
     .student-item:hover { background: var(--saffron-bg); }
     .student-item .name { font-size: 0.9rem; font-weight: 500; }
-    .student-item .tag {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: 700;
-    }
+    .student-item .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
     .tag-new { background: #DCFCE7; color: #166534; }
     .tag-admin { background: #FEF3C7; color: #92400E; }
-    .del-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      color: var(--text-light);
-      padding: 4px;
-      border-radius: 6px;
-      transition: all 0.15s;
-    }
+    .del-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-light); padding: 4px; border-radius: 6px; transition: all 0.15s; }
     .del-btn:hover { background: #FEE2E2; color: var(--danger); }
-    .denied {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--danger);
-    }
+    .denied { text-align: center; padding: 60px 20px; color: var(--danger); }
     .denied span { font-size: 3rem; display: block; margin-bottom: 12px; }
   </style>
 </head>
@@ -124,8 +48,8 @@
       <div class="two-col">
         <div class="add-card">
           <div class="card-title">➕ नवीन विद्यार्थी जोडा</div>
-          <input type="text" id="newName" placeholder="विद्यार्थ्याचे नाव..." onkeydown="if(event.key==='Enter')addStudent()"/>
-          <button class="btn btn-primary" onclick="addStudent()">जोडा</button>
+          <input type="text" id="newName" placeholder="विद्यार्थ्याचे नाव..."/>
+          <button class="btn btn-primary" id="addBtn">जोडा</button>
 
           <div class="divider"></div>
 
@@ -151,7 +75,14 @@
 
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
-  <script>
+  <script type="module">
+    import { addStudentRecord, deleteStudentRecord, getStudents } from "./firebase-client.js";
+
+    document.getElementById("addBtn").addEventListener("click", addStudent);
+    document.getElementById("newName").addEventListener("keydown", event => {
+      if (event.key === "Enter") addStudent();
+    });
+
     window.addEventListener("DOMContentLoaded", async () => {
       if (!isAdmin()) {
         document.getElementById("deniedMsg").style.display = "block";
@@ -162,8 +93,8 @@
     });
 
     async function addStudent() {
-      const inp = document.getElementById("newName");
-      const name = inp.value.trim();
+      const input = document.getElementById("newName");
+      const name = input.value.trim();
       if (!name) {
         showToast("कृपया नाव टाका", "error");
         return;
@@ -171,22 +102,11 @@
 
       try {
         await addStudentRecord(name);
-        inp.value = "";
+        input.value = "";
         showToast(`✓ "${name}" जोडले!`);
         await renderList();
       } catch (error) {
         showToast(error.message || "Student add झाला नाही", "error");
-      }
-    }
-
-    async function deleteStudent(name) {
-      if (!confirm(`"${name}" काढायचे का?`)) return;
-      try {
-        await deleteStudentRecord(name);
-        showToast(`"${name}" काढले`);
-        await renderList();
-      } catch (error) {
-        showToast(error.message || "Student delete झाला नाही", "error");
       }
     }
 
@@ -201,7 +121,6 @@
       all.forEach(name => {
         const isAdminUser = CONFIG.ADMINS.includes(name);
         const isDefault = CONFIG.DEFAULT_STUDENTS.includes(name);
-
         const item = document.createElement("div");
         item.className = "student-item";
         item.innerHTML = `
@@ -211,9 +130,23 @@
             ${isAdminUser ? '<span class="tag tag-admin">Admin</span>' : ""}
             ${!isDefault ? '<span class="tag tag-new">New</span>' : ""}
           </div>
-          ${!isDefault ? `<button class="del-btn" onclick="deleteStudent('${name.replace(/'/g, "\\'")}')">🗑</button>` : '<span style="width:28px;"></span>'}
+          ${!isDefault ? `<button class="del-btn" data-name="${name.replace(/"/g, "&quot;")}">🗑</button>` : '<span style="width:28px;"></span>'}
         `;
         list.appendChild(item);
+      });
+
+      list.querySelectorAll(".del-btn").forEach(button => {
+        button.addEventListener("click", async () => {
+          const name = button.getAttribute("data-name");
+          if (!confirm(`"${name}" काढायचे का?`)) return;
+          try {
+            await deleteStudentRecord(name);
+            showToast(`"${name}" काढले`);
+            await renderList();
+          } catch (error) {
+            showToast(error.message || "Student delete झाला नाही", "error");
+          }
+        });
       });
     }
   </script>
