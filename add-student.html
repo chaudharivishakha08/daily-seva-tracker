@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>श्री स्वामी समर्थ — Add Student</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .page-body {
+      flex: 1;
+      padding: 28px 20px 40px;
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* Add form card */
+    .add-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      padding: 24px 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-mid);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .add-card input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.18s;
+    }
+    .add-card input[type="text"]:focus { border-color: var(--saffron); background: white; }
+
+    /* Student list card */
+    .list-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .list-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .student-list { max-height: 460px; overflow-y: auto; }
+
+    .student-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+    }
+    .student-item:last-child { border-bottom: none; }
+    .student-item:hover { background: var(--saffron-bg); }
+
+    .student-item .name { font-size: 0.9rem; font-weight: 500; }
+    .student-item .tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+    .tag-default { background: var(--cream-dark); color: var(--text-light); }
+    .tag-new { background: #DCFCE7; color: #166534; }
+    .tag-admin { background: #FEF3C7; color: #92400E; }
+
+    .del-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 1rem; color: var(--text-light);
+      padding: 4px; border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .del-btn:hover { background: #FEE2E2; color: var(--danger); }
+
+    .denied {
+      text-align: center; padding: 60px 20px; color: var(--danger);
+    }
+    .denied span { font-size: 3rem; display: block; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'">← मागे</button>
+    <span class="top-bar-title">श्री स्वामी समर्थ</span>
+    <div style="width:80px;"></div>
+  </div>
+
+  <div class="page-body">
+    <div class="denied" id="deniedMsg" style="display:none;">
+      <span>🔒</span>
+      <h2>Access Denied</h2>
+      <p style="color:var(--text-light);margin-top:8px;">फक्त अधिकृत व्यक्तींसाठी</p>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+      <div class="two-col">
+
+        <!-- Add Student -->
+        <div class="add-card">
+          <div class="card-title">➕ नवीन विद्यार्थी जोडा</div>
+          <input type="text" id="newName" placeholder="विद्यार्थ्याचे नाव..." onkeydown="if(event.key==='Enter')addStudent()"/>
+          <button class="btn btn-primary" onclick="addStudent()">जोडा</button>
+
+          <div class="divider"></div>
+
+          <div style="font-size:0.78rem;color:var(--text-light);line-height:1.6;">
+            <strong style="color:var(--text-mid);">नोंद:</strong><br/>
+            • नवीन विद्यार्थ्याचे नाव टाका आणि जोडा<br/>
+            • हे नाव dropdown मध्ये दिसेल<br/>
+            • Delete बटणाने नाव काढता येईल<br/>
+            • Default विद्यार्थ्यांचे नाव काढता येत नाही
+          </div>
+        </div>
+
+        <!-- Student List -->
+        <div class="list-card">
+          <div class="list-header">
+            <span class="card-title" style="margin-bottom:0;">👥 विद्यार्थी यादी</span>
+            <span style="font-size:0.8rem;font-weight:700;color:var(--saffron);" id="countBadge">0</span>
+          </div>
+          <div class="student-list" id="studentList"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="config.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!isAdmin()) {
+        document.getElementById('deniedMsg').style.display = 'block';
+        return;
+      }
+      document.getElementById('mainContent').style.display = 'block';
+      renderList();
+    });
+
+    function addStudent() {
+      const inp = document.getElementById('newName');
+      const name = inp.value.trim();
+      if (!name) { showToast('कृपया नाव टाका', 'error'); return; }
+
+      const extra = JSON.parse(localStorage.getItem('extra_students') || '[]');
+      const all = [...CONFIG.DEFAULT_STUDENTS, ...extra];
+      if (all.map(n=>n.toLowerCase()).includes(name.toLowerCase())) {
+        showToast('हे नाव आधीच आहे!', 'error'); return;
+      }
+
+      extra.push(name);
+      localStorage.setItem('extra_students', JSON.stringify(extra));
+      inp.value = '';
+      showToast(`✓ "${name}" जोडले!`);
+      renderList();
+    }
+
+    function deleteStudent(name) {
+      if (!confirm(`"${name}" काढायचे का?`)) return;
+      const extra = JSON.parse(localStorage.getItem('extra_students') || '[]');
+      const updated = extra.filter(n => n !== name);
+      localStorage.setItem('extra_students', JSON.stringify(updated));
+      showToast(`"${name}" काढले`);
+      renderList();
+    }
+
+    function renderList() {
+      const extra = JSON.parse(localStorage.getItem('extra_students') || '[]');
+      const all = getStudents();
+      const list = document.getElementById('studentList');
+      const countBadge = document.getElementById('countBadge');
+
+      countBadge.textContent = all.length;
+      list.innerHTML = '';
+
+      all.forEach(name => {
+        const isDefault = CONFIG.DEFAULT_STUDENTS.includes(name);
+        const isAdminUser = CONFIG.ADMINS.includes(name);
+        const isExtra = extra.includes(name);
+
+        const item = document.createElement('div');
+        item.className = 'student-item';
+        item.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;">🧑</span>
+            <span class="name">${name}</span>
+            ${isAdminUser ? '<span class="tag tag-admin">Admin</span>' : ''}
+            ${isExtra    ? '<span class="tag tag-new">New</span>' : ''}
+          </div>
+          ${isExtra ? `<button class="del-btn" onclick="deleteStudent('${name.replace(/'/g,"\\'")}')">🗑</button>` : '<span style="width:28px;"></span>'}
+        `;
+        list.appendChild(item);
+      });
+    }
+  </script>
+</body>
+</html>

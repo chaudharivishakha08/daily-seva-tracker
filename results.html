@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>श्री स्वामी समर्थ — Results</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .page-body {
+      flex: 1;
+      padding: 24px 20px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ---- Filter Bar ---- */
+    .filter-bar {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-group { display: flex; align-items: center; gap: 8px; }
+    .filter-group label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); white-space: nowrap; }
+    .filter-group input[type="date"] {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      outline: none;
+    }
+    .filter-group input[type="date"]:focus { border-color: var(--saffron); }
+
+    .sep { color: var(--border); font-size: 1.2rem; }
+
+    /* ---- Tabs ---- */
+    .tabs-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ---- Student-specific view ---- */
+    .student-view { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Stats summary row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--saffron-dark); line-height: 1; }
+    .stat-lbl { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+
+    /* Student table card */
+    .table-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-toolbar {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tbl-title { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); }
+
+    /* Search */
+    .search-box { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 32px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      background: var(--cream);
+      color: var(--text-dark);
+    }
+    .search-box input:focus { border-color: var(--saffron); }
+    .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: var(--text-light); pointer-events: none; }
+
+    /* Option count pills in student table */
+    .opt-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .opt-pill {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .opt-pill .pill-id { font-size: 0.8rem; }
+    .opt-pill .pill-n { font-weight: 800; }
+
+    /* Option-specific view */
+    .option-view { display: flex; flex-direction: column; gap: 16px; }
+
+    .opt-detail-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .odc-left {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      min-width: 70px;
+    }
+    .odc-badge {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: white;
+      font-weight: 800;
+      font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .odc-count { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
+    .odc-label { font-size: 0.72rem; color: var(--text-light); font-weight: 600; }
+
+    .odc-right { flex: 1; }
+    .odc-text { font-family: 'Tiro Devanagari Marathi', serif; font-size: 1rem; color: var(--text-dark); line-height: 1.5; margin-bottom: 8px; }
+    .odc-names { display: flex; gap: 6px; flex-wrap: wrap; }
+    .name-chip {
+      padding: 3px 10px;
+      background: var(--saffron-bg);
+      border: 1px solid var(--saffron-light);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--text-mid);
+      font-weight: 500;
+    }
+    .odc-bar-wrap { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+    .odc-bar { height: 100%; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; }
+
+    .state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+    .state span { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+    /* Access denied */
+    .denied {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--danger);
+    }
+    .denied span { font-size: 3rem; display: block; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'">← मागे</button>
+    <span class="top-bar-title">श्री स्वामी समर्थ</span>
+    <div style="width:80px;"></div>
+  </div>
+
+  <div class="page-body">
+
+    <!-- Access denied -->
+    <div class="denied" id="deniedMsg">
+      <span>🔒</span>
+      <h2>Access Denied</h2>
+      <p style="color:var(--text-light);margin-top:8px;">फक्त अधिकृत व्यक्तींसाठी</p>
+    </div>
+
+    <!-- Main content (shown only to admins) -->
+    <div id="mainContent" style="display:none;">
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>FROM</label>
+          <input type="date" id="fromDate"/>
+        </div>
+        <span class="sep">→</span>
+        <div class="filter-group">
+          <label>TO</label>
+          <input type="date" id="toDate"/>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="load()">Load</button>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+          <span style="font-size:0.82rem;color:var(--text-light);font-weight:600;" id="rangeInfo"></span>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-row">
+        <div class="tabs">
+          <button class="tab active" id="tabStudent" onclick="switchTab('student')">👤 Student Specific</button>
+          <button class="tab" id="tabOption" onclick="switchTab('option')">📊 Option Specific</button>
+        </div>
+        <span style="font-size:0.82rem;color:var(--text-light);" id="totalInfo"></span>
+      </div>
+
+      <!-- Student Specific View -->
+      <div class="student-view" id="studentView">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <span class="tbl-title">प्रत्येक विद्यार्थ्याची निवड</span>
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" placeholder="नाव शोधा..." oninput="filterStudents()"/>
+            </div>
+          </div>
+          <div class="tbl-wrap" style="border-radius:0;border:none;">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>नाव / Name</th>
+                  <th>A</th>
+                  <th>B</th>
+                  <th>C</th>
+                  <th>D</th>
+                  <th>E</th>
+                  <th>एकूण</th>
+                </tr>
+              </thead>
+              <tbody id="studentBody"></tbody>
+            </table>
+          </div>
+          <div class="state" id="studentEmpty" style="display:none;"><span>👤</span><p>डेटा नाही</p></div>
+        </div>
+      </div>
+
+      <!-- Option Specific View -->
+      <div class="option-view" id="optionView" style="display:none;">
+        <div id="optionCards"></div>
+        <div class="state" id="optionEmpty" style="display:none;"><span>📊</span><p>डेटा नाही</p></div>
+      </div>
+
+      <div class="state" id="loadState"><span>🙏</span><p>तारीख निवडा</p></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="config.js"></script>
+  <script>
+    let currentTab = 'student';
+    let allRows = [];
+    let studentMap = {}; // name -> { A:count, B:count... }
+    let optionMap = {};  // optId -> [names]
+
+    // Access control
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!isAdmin()) {
+        document.getElementById('deniedMsg').style.display = 'block';
+        return;
+      }
+      document.getElementById('mainContent').style.display = 'block';
+
+      // Default: last 7 days
+      const to = getTodayISO();
+      const from = new Date();
+      from.setDate(from.getDate() - 6);
+      document.getElementById('fromDate').value = from.toISOString().split('T')[0];
+      document.getElementById('toDate').value = to;
+      load();
+    });
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tabStudent').className = tab === 'student' ? 'tab active' : 'tab';
+      document.getElementById('tabOption').className  = tab === 'option'  ? 'tab active' : 'tab';
+      document.getElementById('studentView').style.display = tab === 'student' ? 'flex' : 'none';
+      document.getElementById('optionView').style.display  = tab === 'option'  ? 'flex' : 'none';
+    }
+
+    async function load() {
+      const from = document.getElementById('fromDate').value;
+      const to   = document.getElementById('toDate').value;
+      if (!from || !to) { showToast('तारीख निवडा', 'error'); return; }
+
+      document.getElementById('loadState').innerHTML = '<span class="spinner" style="border-color:rgba(249,115,22,0.2);border-top-color:var(--saffron);width:32px;height:32px;border-width:3px;margin:40px auto;display:block;"></span>';
+      document.getElementById('loadState').style.display = 'block';
+      document.getElementById('studentView').style.display = 'none';
+      document.getElementById('optionView').style.display = 'none';
+
+      let rows = [];
+      try {
+        const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?from=${from}&to=${to}`);
+        const data = await res.json();
+        if (data.success) rows = data.data;
+        else throw new Error();
+      } catch {
+        // Local fallback — filter by date range
+        const local = JSON.parse(localStorage.getItem('local_responses')||'[]');
+        rows = local.filter(r => r.date >= from && r.date <= to);
+      }
+
+      allRows = rows;
+      processData(rows);
+      document.getElementById('rangeInfo').textContent = `${from} → ${to}`;
+      document.getElementById('totalInfo').textContent = `${rows.length} total responses`;
+      document.getElementById('loadState').style.display = 'none';
+      switchTab(currentTab);
+    }
+
+    function processData(rows) {
+      studentMap = {};
+      optionMap  = {};
+      CONFIG.SEVA_OPTIONS.forEach(o => optionMap[o.id] = []);
+
+      rows.forEach(r => {
+        const name = r['Student Name'] || r.studentName;
+        const opt  = r['Selected Option'] || r.selectedOption;
+        if (!studentMap[name]) {
+          studentMap[name] = { total: 0 };
+          CONFIG.SEVA_OPTIONS.forEach(o => studentMap[name][o.id] = 0);
+        }
+        studentMap[name][opt] = (studentMap[name][opt] || 0) + 1;
+        studentMap[name].total++;
+        if (!optionMap[opt]) optionMap[opt] = [];
+        optionMap[opt].push(name);
+      });
+
+      renderStudentTable();
+      renderOptionCards();
+    }
+
+    // ---- Student Table ----
+    let studentRows = [];
+
+    function renderStudentTable() {
+      studentRows = Object.entries(studentMap).sort((a,b) => a[0].localeCompare(b[0]));
+      paintStudentTable(studentRows);
+    }
+
+    function paintStudentTable(rows) {
+      const tbody = document.getElementById('studentBody');
+      tbody.innerHTML = '';
+      const emEl = document.getElementById('studentEmpty');
+
+      if (!rows.length) { emEl.style.display = 'block'; return; }
+      emEl.style.display = 'none';
+
+      rows.forEach(([name, counts], i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color:var(--text-light);font-size:0.82rem;">${i+1}</td>
+          <td style="font-weight:600;">🧑 ${name}</td>
+          ${CONFIG.SEVA_OPTIONS.map(o => `<td><span class="badge badge-${o.id}" style="${counts[o.id]?'':'opacity:0.3;'}">${counts[o.id]||0}</span></td>`).join('')}
+          <td style="font-weight:700;color:var(--saffron-dark);">${counts.total}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterStudents() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = studentRows.filter(([name]) => name.toLowerCase().includes(q));
+      paintStudentTable(filtered);
+    }
+
+    // ---- Option Cards ----
+    function renderOptionCards() {
+      const container = document.getElementById('optionCards');
+      container.innerHTML = '';
+      const total = allRows.length;
+      const emEl = document.getElementById('optionEmpty');
+
+      if (!total) { emEl.style.display = 'block'; return; }
+      emEl.style.display = 'none';
+
+      CONFIG.SEVA_OPTIONS.forEach(o => {
+        const names = [...new Set(optionMap[o.id] || [])]; // unique names
+        const count = (optionMap[o.id] || []).length;
+        const pct = total ? Math.round(count/total*100) : 0;
+
+        const card = document.createElement('div');
+        card.className = 'opt-detail-card';
+        card.style.marginBottom = '12px';
+        card.innerHTML = `
+          <div class="odc-left">
+            <div class="odc-badge">${o.id}</div>
+            <div class="odc-count">${count}</div>
+            <div class="odc-label">${pct}%</div>
+          </div>
+          <div class="odc-right">
+            <div class="odc-text">${o.text}</div>
+            <div class="odc-names">${names.map(n=>`<span class="name-chip">🧑 ${n}</span>`).join('')}</div>
+            <div class="odc-bar-wrap"><div class="odc-bar" style="width:${pct}%"></div></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>

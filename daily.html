@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>श्री स्वामी समर्थ — Daily</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .page-body {
+      flex: 1;
+      padding: 24px 20px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ---- Filter ---- */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-row input[type="date"] {
+      padding: 9px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      background: white;
+      outline: none;
+      transition: border-color 0.18s;
+      color: var(--text-dark);
+    }
+    .filter-row input[type="date"]:focus { border-color: var(--saffron); }
+
+    .total-pill {
+      margin-left: auto;
+      padding: 6px 14px;
+      background: var(--saffron-bg);
+      border: 1px solid var(--saffron-light);
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-mid);
+    }
+
+    /* ---- Option Summary Cards (modern horizontal) ---- */
+    .opt-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .opt-summary-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1.5px solid var(--border);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.18s;
+      cursor: default;
+      box-shadow: var(--shadow-sm);
+    }
+    .opt-summary-card:hover { border-color: var(--saffron-light); box-shadow: var(--shadow); transform: translateY(-2px); }
+
+    .osc-top { display: flex; align-items: center; justify-content: space-between; }
+    .osc-badge {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: white;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .osc-count { font-size: 2rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
+    .osc-label {
+      font-family: 'Tiro Devanagari Marathi', serif;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      line-height: 1.4;
+    }
+    .osc-bar-wrap { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .osc-bar { height: 100%; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; transition: width 0.6s ease; }
+
+    /* ---- Main grid ---- */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---- Students by option ---- */
+    .section-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-mid);
+    }
+
+    /* Per-option group inside table */
+    .opt-group-header td {
+      background: var(--saffron-bg);
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--saffron-dark);
+      letter-spacing: 0.3px;
+    }
+
+    /* ---- Pie chart card ---- */
+    .chart-card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-card .section-title { margin-bottom: 16px; }
+    .chart-canvas-wrap { max-width: 260px; margin: 0 auto; }
+
+    /* empty/loading */
+    .state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+    .state span { font-size: 2rem; display: block; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'">← मागे</button>
+    <span class="top-bar-title">श्री स्वामी समर्थ</span>
+    <div style="width:80px;"></div>
+  </div>
+
+  <div class="page-body">
+    <!-- Filter -->
+    <div class="filter-row">
+      <span style="font-size:0.85rem;font-weight:600;color:var(--text-mid);">📅 दिनांक:</span>
+      <input type="date" id="dateInput"/>
+      <button class="btn btn-primary btn-sm" onclick="load()">पहा</button>
+      <span class="total-pill" id="totalPill" style="display:none;">👥 <span id="totalNum">0</span> responses</span>
+    </div>
+
+    <!-- Option Summary Cards -->
+    <div class="opt-summary-grid" id="summaryGrid"></div>
+
+    <!-- Main grid -->
+    <div class="main-grid" id="mainGrid" style="display:none;">
+      <!-- Left: students grouped by option -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-title">विद्यार्थ्यांची यादी</span>
+        </div>
+        <div class="tbl-wrap" style="border-radius:0;border:none;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th>नाव / Name</th>
+                <th>पर्याय</th>
+                <th>सेवा तपशील</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="state" id="tableEmpty" style="display:none;"><span>📋</span>डेटा नाही</div>
+      </div>
+
+      <!-- Right: Pie chart -->
+      <div class="chart-card">
+        <div class="section-title" style="font-size:0.88rem;font-weight:700;color:var(--text-mid);margin-bottom:16px;">वितरण</div>
+        <div class="chart-canvas-wrap">
+          <canvas id="pieCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="state" id="emptyState"><span>🙏</span><p>तारीख निवडा</p></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="config.js"></script>
+  <script>
+    let pieChart = null;
+
+    document.getElementById('dateInput').value = getTodayISO();
+    window.addEventListener('DOMContentLoaded', load);
+
+    function load() {
+      const date = document.getElementById('dateInput').value;
+      if (!date) { showToast('तारीख निवडा', 'error'); return; }
+
+      document.getElementById('mainGrid').style.display = 'none';
+      document.getElementById('summaryGrid').innerHTML = '';
+      document.getElementById('totalPill').style.display = 'none';
+
+      // Step 1: Render from localStorage instantly — zero wait
+      const localRows = (JSON.parse(localStorage.getItem('local_responses')||'[]')).filter(r=>r.date===date);
+      document.getElementById('emptyState').style.display = localRows.length ? 'none' : 'block';
+      if (localRows.length) render(localRows);
+
+      // Step 2: Fetch from Google Sheets silently in background
+      fetch(`${CONFIG.APPS_SCRIPT_URL}?date=${date}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.success || !data.data) return;
+          const sheetRows = data.data;
+          if (!sheetRows.length) return;
+
+          // Merge: sheet data is authoritative — sync to localStorage
+          const allLocal = JSON.parse(localStorage.getItem('local_responses')||'[]');
+          const otherDays = allLocal.filter(r => r.date !== date);
+          localStorage.setItem('local_responses', JSON.stringify([...otherDays, ...sheetRows]));
+
+          // Re-render silently only if count changed
+          if (sheetRows.length !== localRows.length) render(sheetRows);
+        })
+        .catch(() => {}); // silently ignore — local data already shown
+    }
+
+    function render(rows) {
+      const em = document.getElementById('emptyState');
+
+      // Count per option
+      const counts = {};
+      CONFIG.SEVA_OPTIONS.forEach(o => counts[o.id] = []);
+      rows.forEach(r => {
+        const opt = r['Selected Option'] || r.selectedOption;
+        const name = r['Student Name'] || r.studentName;
+        if (!counts[opt]) counts[opt] = [];
+        counts[opt].push(name);
+      });
+
+      const total = rows.length;
+      document.getElementById('totalNum').textContent = total;
+      document.getElementById('totalPill').style.display = total ? 'inline-flex' : 'none';
+
+      // Summary cards
+      const grid = document.getElementById('summaryGrid');
+      grid.innerHTML = '';
+      CONFIG.SEVA_OPTIONS.forEach(o => {
+        const n = (counts[o.id]||[]).length;
+        const pct = total ? Math.round(n/total*100) : 0;
+        const card = document.createElement('div');
+        card.className = 'opt-summary-card';
+        card.innerHTML = `
+          <div class="osc-top">
+            <div class="osc-badge">${o.id}</div>
+            <div class="osc-count">${n}</div>
+          </div>
+          <div class="osc-label font-marathi">${o.text}</div>
+          <div class="osc-bar-wrap"><div class="osc-bar" style="width:${pct}%"></div></div>
+        `;
+        grid.appendChild(card);
+      });
+
+      if (!total) {
+        em.innerHTML = '<span>🙏</span><p>या दिवसाचा डेटा नाही</p>';
+        em.style.display = 'block';
+        return;
+      }
+
+      em.style.display = 'none';
+      document.getElementById('mainGrid').style.display = 'grid';
+
+      // Table grouped by option
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      let serial = 0;
+
+      CONFIG.SEVA_OPTIONS.forEach(o => {
+        const students = counts[o.id] || [];
+        if (!students.length) return;
+        // Group header
+        const hdr = document.createElement('tr');
+        hdr.className = 'opt-group-header';
+        hdr.innerHTML = `<td colspan="4">पर्याय ${o.id} — ${o.text} (${students.length})</td>`;
+        tbody.appendChild(hdr);
+
+        students.forEach(name => {
+          serial++;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="color:var(--text-light);font-size:0.82rem;">${serial}</td>
+            <td style="font-weight:500;">🧑 ${name}</td>
+            <td><span class="badge badge-${o.id}">${o.id}</span></td>
+            <td class="font-marathi" style="font-size:0.85rem;color:var(--text-mid);">${o.text}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+
+      // Pie chart
+      if (pieChart) { pieChart.destroy(); pieChart = null; }
+      const canvas = document.getElementById('pieCanvas');
+      canvas.getContext('2d');
+      pieChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: CONFIG.SEVA_OPTIONS.map(o => o.id),
+          datasets: [{
+            data: CONFIG.SEVA_OPTIONS.map(o => (counts[o.id]||[]).length),
+            backgroundColor: ['#F97316','#16A34A','#3B82F6','#EC4899','#6B7280'],
+            borderColor: '#fff',
+            borderWidth: 3,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { font: { family:'Inter', size:11 }, padding: 10, boxWidth: 12, color:'#431407' }
+            },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.parsed} students` } }
+          },
+          cutout: '55%'
+        }
+      });
+    }
+  </script>
+</body>
+</html>
