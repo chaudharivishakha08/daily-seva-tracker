@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="mr">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,7 +30,6 @@
         opacity: 0;
         transform: translateY(18px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
@@ -44,7 +42,7 @@
     }
 
     .logo h1 {
-      font-family: 'Tiro Devanagari Marathi', serif;
+      font-family: "Tiro Devanagari Marathi", serif;
       font-size: 2.5rem;
       color: var(--saffron);
     }
@@ -110,7 +108,6 @@
         opacity: 0;
         transform: translateY(-6px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
@@ -138,7 +135,7 @@
       padding: 11px 14px;
       border: 1.5px solid var(--border);
       border-radius: var(--r-sm);
-      font-family: 'Inter', sans-serif;
+      font-family: "Inter", sans-serif;
       font-size: 0.93rem;
       color: var(--text-dark);
       background: var(--cream);
@@ -182,7 +179,6 @@
     }
   </style>
 </head>
-
 <body>
   <div class="login-card">
     <div class="logo">
@@ -200,12 +196,10 @@
       </div>
     </div>
 
-    <!-- Password field — shown only for admins -->
     <div class="password-wrap" id="passwordWrap">
       <label>पासवर्ड / Password</label>
       <div class="pw-input-row">
-        <input type="password" id="pwInput" placeholder="पासवर्ड टाका..." oninput="onPwInput()"
-          onkeydown="if(event.key==='Enter')go()" />
+        <input type="password" id="pwInput" placeholder="पासवर्ड टाका..." oninput="onPwInput()" onkeydown="if(event.key==='Enter')go()" />
         <button class="pw-toggle" id="pwToggle" onclick="togglePw()" type="button" title="Show/Hide">👁</button>
       </div>
       <div class="pw-error" id="pwError">❌ चुकीचा पासवर्ड</div>
@@ -227,104 +221,103 @@
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
   <script>
-    const ADMIN_PASSWORD = 'ShreeSwamiSamarth@121';
+    const ADMIN_PASSWORD = "ShreeSwamiSamarth@121";
 
-    const sel = document.getElementById('studentSelect');
-    const btn = document.getElementById('enterBtn');
-    const pwWrap = document.getElementById('passwordWrap');
-    const pwInput = document.getElementById('pwInput');
-    const pwError = document.getElementById('pwError');
+    const sel = document.getElementById("studentSelect");
+    const btn = document.getElementById("enterBtn");
+    const pwWrap = document.getElementById("passwordWrap");
+    const pwInput = document.getElementById("pwInput");
+    const pwError = document.getElementById("pwError");
 
-    getStudents().forEach(n => {
-      const o = document.createElement('option');
-      o.value = n; o.textContent = n;
-      sel.appendChild(o);
-    });
+    window.addEventListener("DOMContentLoaded", initPage);
 
-    sel.addEventListener('change', () => {
+    async function initPage() {
+      try {
+        const students = await getStudents();
+        students.forEach(name => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          sel.appendChild(option);
+        });
+      } catch (error) {
+        showToast("Student list load झाली नाही", "error");
+      }
+    }
+
+    sel.addEventListener("change", async () => {
       const name = sel.value;
-      const note = document.getElementById('alreadyNote');
-      const adminLinks = document.getElementById('adminLinks');
+      const note = document.getElementById("alreadyNote");
+      const adminLinks = document.getElementById("adminLinks");
 
-      // Reset password field on every change
-      pwWrap.style.display = 'none';
-      pwInput.value = '';
-      pwInput.classList.remove('error');
-      pwError.style.display = 'none';
-      adminLinks.style.display = 'none';
+      pwWrap.style.display = "none";
+      pwInput.value = "";
+      pwInput.classList.remove("error");
+      pwError.style.display = "none";
+      adminLinks.style.display = "none";
 
-      if (!name) { btn.disabled = true; note.style.display = 'none'; return; }
+      if (!name) {
+        btn.disabled = true;
+        note.style.display = "none";
+        return;
+      }
 
-      const isAdmin = CONFIG.ADMINS.includes(name);
-      const already = localStorage.getItem(`submitted_${getTodayISO()}_${name}`);
-
-      if (isAdmin) {
-        // Show password field, disable proceed until password verified
-        pwWrap.style.display = 'block';
+      const adminSelected = CONFIG.ADMINS.includes(name);
+      if (adminSelected) {
+        pwWrap.style.display = "block";
         pwInput.focus();
         btn.disabled = true;
-        note.style.display = 'none';
-      } else if (already) {
-        note.style.display = 'block';
+        note.style.display = "none";
+        return;
+      }
+
+      try {
+        const already = await hasSubmitted(name, getTodayISO());
+        note.style.display = already ? "block" : "none";
+        btn.disabled = already;
+        btn.textContent = already ? "✓ आज उत्तर दिले" : "पुढे जा →";
+      } catch (error) {
+        showToast("Submission status तपासता आला नाही", "error");
         btn.disabled = true;
-        btn.textContent = '✓ आज उत्तर दिले';
-      } else {
-        note.style.display = 'none';
-        btn.disabled = false;
-        btn.innerHTML = 'पुढे जा →';
       }
     });
 
     function onPwInput() {
       const name = sel.value;
-      pwInput.classList.remove('error');
-      pwError.style.display = 'none';
+      pwInput.classList.remove("error");
+      pwError.style.display = "none";
 
       if (pwInput.value === ADMIN_PASSWORD) {
-        // Password correct — set session NOW so admin links work immediately
-        sessionStorage.setItem('currentStudent', name);
-
+        sessionStorage.setItem("currentStudent", name);
         btn.disabled = false;
-        btn.innerHTML = 'पुढे जा →';
-        document.getElementById('adminLinks').style.display = 'flex';
-
-        const already = localStorage.getItem('submitted_' + getTodayISO() + '_' + name);
-        if (already) {
-          document.getElementById('alreadyNote').style.display = 'block';
-          btn.disabled = true;
-          btn.textContent = '✓ आज उत्तर दिले';
-        }
+        btn.textContent = "पुढे जा →";
+        document.getElementById("adminLinks").style.display = "flex";
       } else {
-        // Password wrong — clear session
-        sessionStorage.removeItem('currentStudent');
+        sessionStorage.removeItem("currentStudent");
         btn.disabled = true;
-        document.getElementById('adminLinks').style.display = 'none';
+        document.getElementById("adminLinks").style.display = "none";
       }
     }
 
     function togglePw() {
-      pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
-      document.getElementById('pwToggle').textContent = pwInput.type === 'password' ? '👁' : '🙈';
+      pwInput.type = pwInput.type === "password" ? "text" : "password";
+      document.getElementById("pwToggle").textContent = pwInput.type === "password" ? "👁" : "🙈";
     }
 
     function go() {
       const name = sel.value;
       if (!name) return;
 
-      // If admin, verify password one final time before proceeding
-      if (CONFIG.ADMINS.includes(name)) {
-        if (pwInput.value !== ADMIN_PASSWORD) {
-          pwInput.classList.add('error');
-          pwError.style.display = 'block';
-          pwInput.focus();
-          return;
-        }
+      if (CONFIG.ADMINS.includes(name) && pwInput.value !== ADMIN_PASSWORD) {
+        pwInput.classList.add("error");
+        pwError.style.display = "block";
+        pwInput.focus();
+        return;
       }
 
-      sessionStorage.setItem('currentStudent', name);
-      window.location.href = 'poll.html';
+      sessionStorage.setItem("currentStudent", name);
+      window.location.href = "poll.html";
     }
   </script>
 </body>
-
 </html>

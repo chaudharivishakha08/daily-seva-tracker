@@ -1,0 +1,37 @@
+{
+  "extraStudents": [],
+  "responses": [
+    {
+      "date": "2026-05-17",
+      "studentName": "Himanshi Jadhav",
+      "question": "आजची (17/05/2026) श्री स्वामी समर्थ महाराजांची सेवा केली का?",
+      "selectedOption": "A",
+      "optionText": "होय ३ अध्याय वाचन व ११ माळी जप केला",
+      "timestamp": "2026-05-17T15:46:40.005Z"
+    },
+    {
+      "date": "2026-05-17",
+      "studentName": "Hirnya Thakare",
+      "question": "आजची (17/05/2026) श्री स्वामी समर्थ महाराजांची सेवा केली का?",
+      "selectedOption": "B",
+      "optionText": "फक्त ३ अध्याय श्री स्वामी चरित्र क्रमशः वाचन केले",
+      "timestamp": "2026-05-17T15:46:52.395Z"
+    },
+    {
+      "date": "2026-05-17",
+      "studentName": "Vandana Chaudhari",
+      "question": "आजची (17/05/2026) श्री स्वामी समर्थ महाराजांची सेवा केली का?",
+      "selectedOption": "A",
+      "optionText": "होय ३ अध्याय वाचन व ११ माळी जप केला",
+      "timestamp": "2026-05-17T15:47:04.654Z"
+    },
+    {
+      "date": "2026-05-17",
+      "studentName": "Shruti Garud",
+      "question": "आजची (17/05/2026) श्री स्वामी समर्थ महाराजांची सेवा केली का?",
+      "selectedOption": "D",
+      "optionText": "११ पेक्षा कमी माळी जप श्री स्वामी समर्थ मंत्रांचा केला",
+      "timestamp": "2026-05-17T15:48:56.859Z"
+    }
+  ]
+}

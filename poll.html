@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>श्री स्वामी समर्थ — Poll</title>
+  <title>श्री स्वामी समर्थ - Poll</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
-
-    /* ---- Layout ---- */
     .poll-body {
       flex: 1;
       display: flex;
@@ -19,8 +17,6 @@
       margin: 0 auto;
       gap: 20px;
     }
-
-    /* ---- Question Card ---- */
     .question-card {
       background: var(--white);
       border-radius: var(--r-lg);
@@ -30,16 +26,16 @@
       position: relative;
       overflow: hidden;
     }
-
     .question-card::before {
-      content: '';
+      content: "";
       position: absolute;
-      left: 0; top: 0; bottom: 0;
+      left: 0;
+      top: 0;
+      bottom: 0;
       width: 5px;
       background: linear-gradient(180deg, var(--saffron), var(--saffron-dark));
       border-radius: 4px 0 0 4px;
     }
-
     .q-label {
       font-size: 0.72rem;
       font-weight: 700;
@@ -48,15 +44,12 @@
       letter-spacing: 1px;
       margin-bottom: 10px;
     }
-
     .q-text {
-      font-family: 'Tiro Devanagari Marathi', serif;
+      font-family: "Tiro Devanagari Marathi", serif;
       font-size: 1.18rem;
       line-height: 1.75;
       color: var(--text-dark);
     }
-
-    /* ---- Options Card ---- */
     .options-card {
       background: var(--white);
       border-radius: var(--r-lg);
@@ -64,7 +57,6 @@
       box-shadow: var(--shadow);
       padding: 20px;
     }
-
     .opts-label {
       font-size: 0.72rem;
       font-weight: 700;
@@ -73,25 +65,18 @@
       letter-spacing: 1px;
       margin-bottom: 14px;
     }
-
-    /* Animate rows */
     .opt-row { animation: slide 0.3s ease both; }
     .opt-row:nth-child(1) { animation-delay: 0.04s; }
     .opt-row:nth-child(2) { animation-delay: 0.08s; }
     .opt-row:nth-child(3) { animation-delay: 0.12s; }
     .opt-row:nth-child(4) { animation-delay: 0.16s; }
     .opt-row:nth-child(5) { animation-delay: 0.20s; }
-
     @keyframes slide {
-      from { opacity:0; transform:translateX(-10px); }
-      to   { opacity:1; transform:translateX(0); }
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
     }
-
-    /* ---- Submit ---- */
     .submit-wrap { padding: 0 0 4px; }
     .submit-wrap .btn { width: 100%; padding: 14px; font-size: 1rem; border-radius: var(--r); }
-
-    /* ---- Desktop side-by-side ---- */
     @media (min-width: 860px) {
       .poll-body {
         flex-direction: row;
@@ -100,14 +85,12 @@
         padding: 36px 32px;
         gap: 28px;
       }
-
       .question-card {
         flex: 0 0 360px;
         position: sticky;
         top: 80px;
         min-height: 200px;
       }
-
       .right-panel {
         flex: 1;
         display: flex;
@@ -118,8 +101,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Top Bar -->
   <div class="top-bar">
     <button class="icon-btn" onclick="history.back()">← मागे</button>
     <span class="top-bar-title">श्री स्वामी समर्थ</span>
@@ -129,15 +110,12 @@
     </div>
   </div>
 
-  <!-- Poll Body -->
   <div class="poll-body">
-    <!-- Question -->
     <div class="question-card">
       <div class="q-label">आजचा प्रश्न</div>
       <div class="q-text" id="questionText"></div>
     </div>
 
-    <!-- Right Panel: Options + Submit -->
     <div class="right-panel">
       <div class="options-card">
         <div class="opts-label">पर्याय निवडा</div>
@@ -145,7 +123,7 @@
       </div>
 
       <div class="submit-wrap">
-        <button class="btn btn-primary" id="submitBtn" disabled onclick="submit()">
+        <button class="btn btn-primary" id="submitBtn" disabled onclick="submitResponse()">
           Submit
         </button>
       </div>
@@ -156,22 +134,19 @@
   <script src="config.js"></script>
   <script>
     let selected = null;
+    const student = sessionStorage.getItem("currentStudent");
+    if (!student) window.location.href = "index.html";
 
-    const student = sessionStorage.getItem('currentStudent');
-    if (!student) window.location.href = 'index.html';
+    document.getElementById("userName").textContent = student;
+    document.getElementById("userAvatar").textContent = student.charAt(0).toUpperCase();
 
-    document.getElementById('userName').textContent = student;
-    document.getElementById('userAvatar').textContent = student.charAt(0).toUpperCase();
+    const q = CONFIG.SEVA_QUESTION.replace("{date}", getTodayDisplay());
+    document.getElementById("questionText").textContent = q;
 
-    // Build question with today's date
-    const q = CONFIG.SEVA_QUESTION.replace('{date}', getTodayDisplay());
-    document.getElementById('questionText').textContent = q;
-
-    // Render options
-    const list = document.getElementById('optsList');
+    const list = document.getElementById("optsList");
     CONFIG.SEVA_OPTIONS.forEach(opt => {
-      const row = document.createElement('div');
-      row.className = 'opt-row';
+      const row = document.createElement("div");
+      row.className = "opt-row";
       row.innerHTML = `
         <div class="opt-badge">${opt.id}</div>
         <div class="opt-text">${opt.text}</div>
@@ -181,18 +156,19 @@
           </svg>
         </div>
       `;
-      row.addEventListener('click', () => {
-        document.querySelectorAll('.opt-row').forEach(r => r.classList.remove('selected'));
-        row.classList.add('selected');
+      row.addEventListener("click", () => {
+        document.querySelectorAll(".opt-row").forEach(r => r.classList.remove("selected"));
+        row.classList.add("selected");
         selected = opt.id;
-        document.getElementById('submitBtn').disabled = false;
+        document.getElementById("submitBtn").disabled = false;
       });
       list.appendChild(row);
     });
 
-    function submit() {
+    async function submitResponse() {
       if (!selected) return;
-      const btn = document.getElementById('submitBtn');
+
+      const btn = document.getElementById("submitBtn");
       btn.disabled = true;
 
       const opt = CONFIG.SEVA_OPTIONS.find(o => o.id === selected);
@@ -204,19 +180,16 @@
         optionText: opt.text
       };
 
-      // 1. Save to localStorage immediately so daily.html renders instantly
-      const ex = JSON.parse(localStorage.getItem('local_responses') || '[]');
-      ex.push(payload);
-      localStorage.setItem('local_responses', JSON.stringify(ex));
-      localStorage.setItem(`submitted_${getTodayISO()}_${student}`, '1');
-
-      // 2. Fire Google Sheets save in background — do NOT await
-      fetch(CONFIG.APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
-        .catch(() => {});
-
-      // 3. Show toast and redirect instantly — no waiting
-      showToast('✓ आपले उत्तर नोंदवले गेले!');
-      setTimeout(() => window.location.href = 'daily.html', 900);
+      try {
+        await saveResponse(payload);
+        showToast("✓ आपले उत्तर नोंदवले गेले!");
+        setTimeout(() => {
+          window.location.href = "daily.html";
+        }, 900);
+      } catch (error) {
+        btn.disabled = false;
+        showToast(error.message || "उत्तर जतन झाले नाही", "error");
+      }
     }
   </script>
 </body>
