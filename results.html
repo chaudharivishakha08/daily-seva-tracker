@@ -17,6 +17,7 @@
     .tabs-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
     .student-view { display: flex; flex-direction: column; gap: 16px; }
     .option-view { display: flex; flex-direction: column; gap: 16px; }
+    .weekly-view { display: flex; flex-direction: column; gap: 16px; }
     .table-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm); }
     .table-toolbar { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .tbl-title { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); }
@@ -35,6 +36,8 @@
     .name-chip { padding: 3px 10px; background: var(--saffron-bg); border: 1px solid var(--saffron-light); border-radius: 20px; font-size: 0.75rem; color: var(--text-mid); font-weight: 500; }
     .odc-bar-wrap { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 10px; }
     .odc-bar { height: 100%; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; }
+    .weekly-option { font-weight: 700; }
+    .weekly-missing { color: var(--text-light); opacity: 0.55; }
     .state { text-align: center; padding: 40px 20px; color: var(--text-light); }
     .state span { font-size: 2rem; display: block; margin-bottom: 8px; }
     .denied { display: none; text-align: center; padding: 60px 20px; color: var(--danger); }
@@ -76,6 +79,7 @@
         <div class="tabs">
           <button class="tab active" id="tabStudent">👤 Student Specific</button>
           <button class="tab" id="tabOption">📊 Option Specific</button>
+          <button class="tab" id="tabWeekly">📅 Weekly Progress</button>
         </div>
         <span style="font-size:0.82rem;color:var(--text-light);" id="totalInfo"></span>
       </div>
@@ -115,6 +119,27 @@
         <div class="state" id="optionEmpty" style="display:none;"><span>📊</span><p>डेटा नाही</p></div>
       </div>
 
+      <div class="weekly-view" id="weeklyView" style="display:none;">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <span class="tbl-title">Weekly Progress</span>
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="weeklySearchInput" placeholder="नाव शोधा..."/>
+            </div>
+          </div>
+          <div class="tbl-wrap" style="border-radius:0;border:none;">
+            <table>
+              <thead>
+                <tr id="weeklyHead"></tr>
+              </thead>
+              <tbody id="weeklyBody"></tbody>
+            </table>
+          </div>
+          <div class="state" id="weeklyEmpty" style="display:none;"><span>📅</span><p>डेटा नाही</p></div>
+        </div>
+      </div>
+
       <div class="state" id="loadState"><span>🙏</span><p>तारीख निवडा</p></div>
     </div>
   </div>
@@ -122,18 +147,23 @@
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
   <script type="module">
-    import { getResponsesByRange } from "./firebase-client.js";
+    import { getResponsesByRange, getStudents } from "./firebase-client.js";
 
     let currentTab = "student";
     let allRows = [];
+    let allStudentNames = [];
     let studentMap = {};
     let optionMap = {};
     let studentRows = [];
+    let weeklyRows = [];
+    let weekDates = [];
 
     document.getElementById("loadBtn").addEventListener("click", load);
     document.getElementById("tabStudent").addEventListener("click", () => switchTab("student"));
     document.getElementById("tabOption").addEventListener("click", () => switchTab("option"));
+    document.getElementById("tabWeekly").addEventListener("click", () => switchTab("weekly"));
     document.getElementById("searchInput").addEventListener("input", filterStudents);
+    document.getElementById("weeklySearchInput").addEventListener("input", filterWeekly);
 
     window.addEventListener("DOMContentLoaded", () => {
       if (!isAdmin()) {
@@ -154,8 +184,10 @@
       currentTab = tab;
       document.getElementById("tabStudent").className = tab === "student" ? "tab active" : "tab";
       document.getElementById("tabOption").className = tab === "option" ? "tab active" : "tab";
+      document.getElementById("tabWeekly").className = tab === "weekly" ? "tab active" : "tab";
       document.getElementById("studentView").style.display = tab === "student" ? "flex" : "none";
       document.getElementById("optionView").style.display = tab === "option" ? "flex" : "none";
+      document.getElementById("weeklyView").style.display = tab === "weekly" ? "flex" : "none";
     }
 
     async function load() {
@@ -167,8 +199,13 @@
       }
 
       try {
-        const rows = await getResponsesByRange(from, to);
+        const [rows, students] = await Promise.all([
+          getResponsesByRange(from, to),
+          getStudents()
+        ]);
         allRows = rows;
+        allStudentNames = students;
+        weekDates = buildDateRange(from, to);
         processData(rows);
         document.getElementById("rangeInfo").textContent = `${from} → ${to}`;
         document.getElementById("totalInfo").textContent = `${rows.length} total responses`;
@@ -202,6 +239,7 @@
 
       renderStudentTable();
       renderOptionCards();
+      renderWeeklyTable();
     }
 
     function renderStudentTable() {
@@ -271,6 +309,95 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    function renderWeeklyTable() {
+      const responseNames = allRows.map(row => row.studentName);
+      const names = [...new Set([...allStudentNames, ...responseNames])].sort((a, b) => a.localeCompare(b));
+      const byStudent = {};
+
+      names.forEach(name => {
+        byStudent[name] = {};
+      });
+
+      allRows.forEach(row => {
+        if (!byStudent[row.studentName]) byStudent[row.studentName] = {};
+        byStudent[row.studentName][row.date] = row.selectedOption;
+      });
+
+      weeklyRows = Object.entries(byStudent);
+      paintWeeklyTable(weeklyRows);
+    }
+
+    function paintWeeklyTable(rows) {
+      const head = document.getElementById("weeklyHead");
+      const tbody = document.getElementById("weeklyBody");
+      const emEl = document.getElementById("weeklyEmpty");
+      head.innerHTML = `
+        <th>#</th>
+        <th>नाव / Name</th>
+        ${weekDates.map(date => `<th>${formatWeeklyHeader(date)}</th>`).join("")}
+      `;
+      tbody.innerHTML = "";
+
+      if (!rows.length) {
+        emEl.style.display = "block";
+        return;
+      }
+      emEl.style.display = "none";
+
+      rows.forEach(([name, selections], index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="color:var(--text-light);font-size:0.82rem;">${index + 1}</td>
+          <td style="font-weight:600;"> ${name}</td>
+          ${weekDates.map(date => {
+            const value = selections[date];
+            return value
+              ? `<td><span class="badge badge-${value} weekly-option">${value}</span></td>`
+              : `<td><span class="weekly-missing">-</span></td>`;
+          }).join("")}
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterWeekly() {
+      const q = document.getElementById("weeklySearchInput").value.toLowerCase();
+      const filtered = weeklyRows.filter(([name]) => name.toLowerCase().includes(q));
+      paintWeeklyTable(filtered);
+    }
+
+    function buildDateRange(from, to) {
+      const dates = [];
+      const cursor = parseISODate(from);
+      const end = parseISODate(to);
+
+      while (cursor <= end) {
+        dates.push(formatISODate(cursor));
+        cursor.setDate(cursor.getDate() + 1);
+      }
+
+      return dates;
+    }
+
+    function parseISODate(value) {
+      const [year, month, day] = value.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function formatISODate(date) {
+      return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+      ].join("-");
+    }
+
+    function formatWeeklyHeader(date) {
+      const labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const parsed = parseISODate(date);
+      return `${labels[parsed.getDay()]} (${parsed.getDate()})`;
     }
   </script>
 </body>
