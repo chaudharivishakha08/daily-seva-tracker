@@ -9,10 +9,15 @@
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
     .page-body { flex: 1; padding: 24px 20px 40px; max-width: 1100px; margin: 0 auto; width: 100%; }
-    .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .filter-row input[type="date"] { padding: 9px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: "Inter", sans-serif; font-size: 0.88rem; background: white; outline: none; transition: border-color 0.18s; color: var(--text-dark); }
     .filter-row input[type="date"]:focus { border-color: var(--saffron); }
-    .total-pill { margin-left: auto; padding: 6px 14px; background: var(--saffron-bg); border: 1px solid var(--saffron-light); border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--text-mid); }
+    .total-pill { padding: 6px 14px; background: var(--saffron-bg); border: 1px solid var(--saffron-light); border-radius: 20px; font-size: 0.82rem; font-weight: 700; color: var(--text-mid); }
+    .view-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+    .view-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .view-tab { padding: 9px 18px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-mid); font-family: "Inter", sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.18s; }
+    .view-tab:hover { border-color: var(--saffron-light); background: var(--saffron-bg); }
+    .view-tab.active { border-color: var(--saffron); background: linear-gradient(135deg, var(--saffron), var(--saffron-dark)); color: white; box-shadow: 0 3px 12px rgba(249,115,22,0.24); }
     .opt-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 28px; }
     .opt-summary-card { background: var(--white); border-radius: var(--r-lg); border: 1.5px solid var(--border); padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; transition: all 0.18s; cursor: default; box-shadow: var(--shadow-sm); }
     .opt-summary-card:hover { border-color: var(--saffron-light); box-shadow: var(--shadow); transform: translateY(-2px); }
@@ -47,6 +52,13 @@
       <span style="font-size:0.85rem;font-weight:600;color:var(--text-mid);">📅 दिनांक:</span>
       <input type="date" id="dateInput"/>
       <button class="btn btn-primary btn-sm" id="loadBtn">पहा</button>
+    </div>
+
+    <div class="view-toolbar">
+      <div class="view-tabs">
+        <button class="view-tab active" id="tabSeva" type="button">Swami Seva</button>
+        <button class="view-tab" id="tabNamaskar" type="button">Namaskar</button>
+      </div>
       <span class="total-pill" id="totalPill" style="display:none;">👥 <span id="totalNum">0</span> responses</span>
     </div>
 
@@ -64,7 +76,7 @@
                 <th style="width:40px;">#</th>
                 <th>नाव / Name</th>
                 <th>पर्याय</th>
-                <th>सेवा तपशील</th>
+                <th id="detailHead">सेवा तपशील</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -89,9 +101,21 @@
     import { getResponsesByDate } from "./firebase-client.js";
 
     let pieChart = null;
+    let currentRows = [];
+    let activeQuestionId = "seva";
+
     document.getElementById("dateInput").value = getTodayISO();
     document.getElementById("loadBtn").addEventListener("click", load);
+    document.getElementById("tabSeva").addEventListener("click", () => switchView("seva"));
+    document.getElementById("tabNamaskar").addEventListener("click", () => switchView("parents_namaskar"));
     window.addEventListener("DOMContentLoaded", load);
+
+    function switchView(questionId) {
+      activeQuestionId = questionId;
+      document.getElementById("tabSeva").classList.toggle("active", questionId === "seva");
+      document.getElementById("tabNamaskar").classList.toggle("active", questionId === "parents_namaskar");
+      render(currentRows);
+    }
 
     async function load() {
       const date = document.getElementById("dateInput").value;
@@ -102,6 +126,7 @@
 
       try {
         const rows = await getResponsesByDate(date);
+        currentRows = rows;
         render(rows);
       } catch (error) {
         showToast("डेटा load झाला नाही", "error");
@@ -109,6 +134,8 @@
     }
 
     function render(rows) {
+      const question = getActiveQuestion();
+      const options = getActiveOptions(question);
       const emptyState = document.getElementById("emptyState");
       const mainGrid = document.getElementById("mainGrid");
       const summaryGrid = document.getElementById("summaryGrid");
@@ -118,31 +145,34 @@
       mainGrid.style.display = "none";
       summaryGrid.innerHTML = "";
       tbody.innerHTML = "";
+      document.getElementById("detailHead").textContent = activeQuestionId === "seva" ? "सेवा तपशील" : "नमस्कार तपशील";
 
-      CONFIG.SEVA_OPTIONS.forEach(opt => {
+      options.forEach(opt => {
         counts[opt.id] = [];
       });
 
       rows.forEach(row => {
-        if (!counts[row.selectedOption]) counts[row.selectedOption] = [];
-        counts[row.selectedOption].push(row.studentName);
+        const answer = getAnswer(row, activeQuestionId);
+        if (!answer?.selectedOption) return;
+        if (!counts[answer.selectedOption]) counts[answer.selectedOption] = [];
+        counts[answer.selectedOption].push(row.studentName);
       });
 
       const total = rows.length;
       document.getElementById("totalNum").textContent = total;
       document.getElementById("totalPill").style.display = total ? "inline-flex" : "none";
 
-      CONFIG.SEVA_OPTIONS.forEach(opt => {
+      options.forEach(opt => {
         const n = (counts[opt.id] || []).length;
         const pct = total ? Math.round((n / total) * 100) : 0;
         const card = document.createElement("div");
         card.className = "opt-summary-card";
         card.innerHTML = `
           <div class="osc-top">
-            <div class="osc-badge">${opt.id}</div>
+            <div class="osc-badge">${getOptionBadge(opt)}</div>
             <div class="osc-count">${n}</div>
           </div>
-          <div class="osc-label font-marathi">${opt.text}</div>
+          <div class="osc-label font-marathi">${getOptionText(opt)}</div>
           <div class="osc-bar-wrap"><div class="osc-bar" style="width:${pct}%"></div></div>
         `;
         summaryGrid.appendChild(card);
@@ -162,13 +192,13 @@
       mainGrid.style.display = "grid";
 
       let serial = 0;
-      CONFIG.SEVA_OPTIONS.forEach(opt => {
+      options.forEach(opt => {
         const students = counts[opt.id] || [];
         if (!students.length) return;
 
         const hdr = document.createElement("tr");
         hdr.className = "opt-group-header";
-        hdr.innerHTML = `<td colspan="4">पर्याय ${opt.id} - ${opt.text} (${students.length})</td>`;
+        hdr.innerHTML = `<td colspan="4">पर्याय ${getOptionBadge(opt)} - ${getOptionText(opt)} (${students.length})</td>`;
         tbody.appendChild(hdr);
 
         students.forEach(name => {
@@ -177,8 +207,8 @@
           tr.innerHTML = `
             <td style="color:var(--text-light);font-size:0.82rem;">${serial}</td>
             <td style="font-weight:500;"> ${name}</td>
-            <td><span class="badge badge-${opt.id}">${opt.id}</span></td>
-            <td class="font-marathi" style="font-size:0.85rem;color:var(--text-mid);">${opt.text}</td>
+            <td><span class="badge badge-${opt.id}">${getOptionBadge(opt)}</span></td>
+            <td class="font-marathi" style="font-size:0.85rem;color:var(--text-mid);">${getOptionText(opt)}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -189,10 +219,10 @@
       pieChart = new Chart(document.getElementById("pieCanvas"), {
         type: "doughnut",
         data: {
-          labels: CONFIG.SEVA_OPTIONS.map(opt => opt.id),
+          labels: options.map(opt => getOptionBadge(opt)),
           datasets: [{
-            data: CONFIG.SEVA_OPTIONS.map(opt => (counts[opt.id] || []).length),
-            backgroundColor: ["#F97316", "#16A34A", "#3B82F6", "#EC4899", "#6B7280"],
+            data: options.map(opt => (counts[opt.id] || []).length),
+            backgroundColor: getChartColors(options),
             borderColor: "#fff",
             borderWidth: 3,
             hoverOffset: 6
@@ -210,6 +240,45 @@
           cutout: "55%"
         }
       });
+    }
+
+    function getActiveQuestion() {
+      return CONFIG.POLL_QUESTIONS.find(question => question.id === activeQuestionId);
+    }
+
+    function getActiveOptions(question) {
+      return question.options.map(option => ({
+        id: option.id,
+        text: option.label,
+        label: option.label
+      }));
+    }
+
+    function getAnswer(row, questionId) {
+      if (Array.isArray(row.answers)) {
+        return row.answers.find(answer => answer.questionId === questionId);
+      }
+      if (questionId === "seva") {
+        return {
+          selectedOption: row.selectedOption,
+          optionText: row.optionText
+        };
+      }
+      return null;
+    }
+
+    function getOptionBadge(option) {
+      return option.id.length === 1 ? option.id : option.label;
+    }
+
+    function getOptionText(option) {
+      return option.text || option.label;
+    }
+
+    function getChartColors(options) {
+      const palette = ["#F97316", "#16A34A", "#3B82F6", "#EC4899", "#6B7280"];
+      if (activeQuestionId === "parents_namaskar") return ["#16A34A", "#DC2626"];
+      return options.map((_, index) => palette[index % palette.length]);
     }
   </script>
 </body>

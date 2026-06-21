@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; }
-    .page-body { flex: 1; padding: 24px 20px 40px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .page-body { flex: 1; padding: 24px 20px 40px; max-width: 1180px; margin: 0 auto; width: 100%; }
     .filter-bar { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 18px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
     .filter-group { display: flex; align-items: center; gap: 8px; }
     .filter-group label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); white-space: nowrap; }
@@ -15,20 +15,17 @@
     .filter-group input[type="date"]:focus { border-color: var(--saffron); }
     .sep { color: var(--border); font-size: 1.2rem; }
     .tabs-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
-    .student-view { display: flex; flex-direction: column; gap: 16px; }
-    .option-view { display: flex; flex-direction: column; gap: 16px; }
-    .weekly-view { display: flex; flex-direction: column; gap: 16px; }
+    .student-view, .option-view, .weekly-view { display: flex; flex-direction: column; gap: 16px; }
     .table-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm); }
     .table-toolbar { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .tbl-title { font-size: 0.88rem; font-weight: 700; color: var(--text-mid); }
     .search-box { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
-    .search-box input { width: 100%; padding: 8px 12px 8px 32px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 0.85rem; font-family: "Inter", sans-serif; outline: none; background: var(--cream); color: var(--text-dark); }
-    .search-box input:focus { border-color: var(--saffron); }
-    .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: var(--text-light); pointer-events: none; }
-    .opt-detail-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 20px 22px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 20px; }
-    .odc-left { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 70px; }
-    .odc-badge { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, var(--saffron), var(--saffron-dark)); color: white; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-    .odc-count { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
+    .question-result-block { display: flex; flex-direction: column; gap: 12px; }
+    .question-result-title { font-family: "Tiro Devanagari Marathi", serif; font-size: 1.05rem; color: var(--text-dark); font-weight: 700; }
+    .opt-detail-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); padding: 18px 20px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 18px; }
+    .odc-left { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; }
+    .odc-badge { min-width: 44px; height: 44px; padding: 0 12px; border-radius: 14px; background: linear-gradient(135deg, var(--saffron), var(--saffron-dark)); color: white; font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+    .odc-count { font-size: 1.45rem; font-weight: 800; color: var(--text-dark); }
     .odc-label { font-size: 0.72rem; color: var(--text-light); font-weight: 600; }
     .odc-right { flex: 1; }
     .odc-text { font-family: "Tiro Devanagari Marathi", serif; font-size: 1rem; color: var(--text-dark); line-height: 1.5; margin-bottom: 8px; }
@@ -36,7 +33,7 @@
     .name-chip { padding: 3px 10px; background: var(--saffron-bg); border: 1px solid var(--saffron-light); border-radius: 20px; font-size: 0.75rem; color: var(--text-mid); font-weight: 500; }
     .odc-bar-wrap { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 10px; }
     .odc-bar { height: 100%; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; }
-    .weekly-option { font-weight: 700; }
+    .weekly-option { font-weight: 700; margin-right: 4px; }
     .weekly-missing { color: var(--text-light); opacity: 0.55; }
     .state { text-align: center; padding: 40px 20px; color: var(--text-light); }
     .state span { font-size: 2rem; display: block; margin-bottom: 8px; }
@@ -96,16 +93,7 @@
           <div class="tbl-wrap" style="border-radius:0;border:none;">
             <table>
               <thead>
-                <tr>
-                  <th>#</th>
-                  <th>नाव / Name</th>
-                  <th>A</th>
-                  <th>B</th>
-                  <th>C</th>
-                  <th>D</th>
-                  <th>E</th>
-                  <th>एकूण</th>
-                </tr>
+                <tr id="studentHead"></tr>
               </thead>
               <tbody id="studentBody"></tbody>
             </table>
@@ -152,8 +140,6 @@
     let currentTab = "student";
     let allRows = [];
     let allStudentNames = [];
-    let studentMap = {};
-    let optionMap = {};
     let studentRows = [];
     let weeklyRows = [];
     let weekDates = [];
@@ -206,7 +192,7 @@
         allRows = rows;
         allStudentNames = students;
         weekDates = buildDateRange(from, to);
-        processData(rows);
+        processData();
         document.getElementById("rangeInfo").textContent = `${from} → ${to}`;
         document.getElementById("totalInfo").textContent = `${rows.length} total responses`;
         document.getElementById("loadState").style.display = rows.length ? "none" : "block";
@@ -216,40 +202,63 @@
       }
     }
 
-    function processData(rows) {
-      studentMap = {};
-      optionMap = {};
-      CONFIG.SEVA_OPTIONS.forEach(opt => {
-        optionMap[opt.id] = [];
-      });
-
-      rows.forEach(row => {
-        const name = row.studentName;
-        const opt = row.selectedOption;
-        if (!studentMap[name]) {
-          studentMap[name] = { total: 0 };
-          CONFIG.SEVA_OPTIONS.forEach(entry => {
-            studentMap[name][entry.id] = 0;
-          });
-        }
-        studentMap[name][opt] = (studentMap[name][opt] || 0) + 1;
-        studentMap[name].total++;
-        optionMap[opt].push(name);
-      });
-
+    function processData() {
       renderStudentTable();
       renderOptionCards();
       renderWeeklyTable();
     }
 
+    function getAnswer(row, questionId) {
+      if (Array.isArray(row.answers)) {
+        return row.answers.find(answer => answer.questionId === questionId);
+      }
+      if (questionId === "seva") {
+        return {
+          questionId: "seva",
+          selectedOption: row.selectedOption,
+          optionText: row.optionText
+        };
+      }
+      return null;
+    }
+
     function renderStudentTable() {
+      const studentMap = {};
+      const sevaQuestion = CONFIG.POLL_QUESTIONS.find(question => question.id === "seva");
+      const parentsQuestion = CONFIG.POLL_QUESTIONS.find(question => question.id === "parents_namaskar");
+
+      allRows.forEach(row => {
+        if (!studentMap[row.studentName]) {
+          studentMap[row.studentName] = { total: 0, seva: {}, parents_namaskar: {} };
+          sevaQuestion.options.forEach(option => studentMap[row.studentName].seva[option.id] = 0);
+          parentsQuestion.options.forEach(option => studentMap[row.studentName].parents_namaskar[option.id] = 0);
+        }
+
+        const sevaAnswer = getAnswer(row, "seva");
+        const parentsAnswer = getAnswer(row, "parents_namaskar");
+        if (sevaAnswer?.selectedOption) studentMap[row.studentName].seva[sevaAnswer.selectedOption]++;
+        if (parentsAnswer?.selectedOption) studentMap[row.studentName].parents_namaskar[parentsAnswer.selectedOption]++;
+        studentMap[row.studentName].total++;
+      });
+
       studentRows = Object.entries(studentMap).sort((a, b) => a[0].localeCompare(b[0]));
       paintStudentTable(studentRows);
     }
 
     function paintStudentTable(rows) {
+      const head = document.getElementById("studentHead");
       const tbody = document.getElementById("studentBody");
       const emEl = document.getElementById("studentEmpty");
+      const sevaQuestion = CONFIG.POLL_QUESTIONS.find(question => question.id === "seva");
+      const parentsQuestion = CONFIG.POLL_QUESTIONS.find(question => question.id === "parents_namaskar");
+
+      head.innerHTML = `
+        <th>#</th>
+        <th>नाव / Name</th>
+        ${sevaQuestion.options.map(option => `<th>सेवा ${option.id}</th>`).join("")}
+        ${parentsQuestion.options.map(option => `<th>नमस्कार ${option.label}</th>`).join("")}
+        <th>एकूण</th>
+      `;
       tbody.innerHTML = "";
 
       if (!rows.length) {
@@ -263,7 +272,8 @@
         tr.innerHTML = `
           <td style="color:var(--text-light);font-size:0.82rem;">${index + 1}</td>
           <td style="font-weight:600;"> ${name}</td>
-          ${CONFIG.SEVA_OPTIONS.map(opt => `<td><span class="badge badge-${opt.id}" style="${counts[opt.id] ? "" : "opacity:0.3;"}">${counts[opt.id] || 0}</span></td>`).join("")}
+          ${sevaQuestion.options.map(option => `<td><span class="badge badge-${option.id}" style="${counts.seva[option.id] ? "" : "opacity:0.3;"}">${counts.seva[option.id] || 0}</span></td>`).join("")}
+          ${parentsQuestion.options.map(option => `<td><span class="badge" style="${counts.parents_namaskar[option.id] ? "" : "opacity:0.3;"}">${counts.parents_namaskar[option.id] || 0}</span></td>`).join("")}
           <td style="font-weight:700;color:var(--saffron-dark);">${counts.total}</td>
         `;
         tbody.appendChild(tr);
@@ -272,8 +282,7 @@
 
     function filterStudents() {
       const q = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = studentRows.filter(([name]) => name.toLowerCase().includes(q));
-      paintStudentTable(filtered);
+      paintStudentTable(studentRows.filter(([name]) => name.toLowerCase().includes(q)));
     }
 
     function renderOptionCards() {
@@ -287,27 +296,36 @@
       }
       emEl.style.display = "none";
 
-      CONFIG.SEVA_OPTIONS.forEach(opt => {
-        const names = [...new Set(optionMap[opt.id] || [])];
-        const count = (optionMap[opt.id] || []).length;
-        const pct = allRows.length ? Math.round((count / allRows.length) * 100) : 0;
+      CONFIG.POLL_QUESTIONS.forEach(question => {
+        const block = document.createElement("div");
+        block.className = "question-result-block";
+        block.innerHTML = `<div class="question-result-title">${formatQuestion(question.text)}</div>`;
 
-        const card = document.createElement("div");
-        card.className = "opt-detail-card";
-        card.style.marginBottom = "12px";
-        card.innerHTML = `
-          <div class="odc-left">
-            <div class="odc-badge">${opt.id}</div>
-            <div class="odc-count">${count}</div>
-            <div class="odc-label">${pct}%</div>
-          </div>
-          <div class="odc-right">
-            <div class="odc-text">${opt.text}</div>
-            <div class="odc-names">${names.map(name => `<span class="name-chip"> ${name}</span>`).join("")}</div>
-            <div class="odc-bar-wrap"><div class="odc-bar" style="width:${pct}%"></div></div>
-          </div>
-        `;
-        container.appendChild(card);
+        question.options.forEach(option => {
+          const names = allRows
+            .filter(row => getAnswer(row, question.id)?.selectedOption === option.id)
+            .map(row => row.studentName);
+          const count = names.length;
+          const pct = allRows.length ? Math.round((count / allRows.length) * 100) : 0;
+
+          const card = document.createElement("div");
+          card.className = "opt-detail-card";
+          card.innerHTML = `
+            <div class="odc-left">
+              <div class="odc-badge">${option.id.length === 1 ? option.id : option.label}</div>
+              <div class="odc-count">${count}</div>
+              <div class="odc-label">${pct}%</div>
+            </div>
+            <div class="odc-right">
+              <div class="odc-text">${option.label}</div>
+              <div class="odc-names">${[...new Set(names)].map(name => `<span class="name-chip"> ${name}</span>`).join("")}</div>
+              <div class="odc-bar-wrap"><div class="odc-bar" style="width:${pct}%"></div></div>
+            </div>
+          `;
+          block.appendChild(card);
+        });
+
+        container.appendChild(block);
       });
     }
 
@@ -322,7 +340,10 @@
 
       allRows.forEach(row => {
         if (!byStudent[row.studentName]) byStudent[row.studentName] = {};
-        byStudent[row.studentName][row.date] = row.selectedOption;
+        byStudent[row.studentName][row.date] = {
+          seva: getAnswer(row, "seva")?.selectedOption || "",
+          parents: getAnswer(row, "parents_namaskar")?.optionText || ""
+        };
       });
 
       weeklyRows = Object.entries(byStudent);
@@ -354,7 +375,7 @@
           ${weekDates.map(date => {
             const value = selections[date];
             return value
-              ? `<td><span class="badge badge-${value} weekly-option">${value}</span></td>`
+              ? `<td><span class="badge badge-${value.seva} weekly-option">${value.seva}</span><span>${value.parents || "-"}</span></td>`
               : `<td><span class="weekly-missing">-</span></td>`;
           }).join("")}
         `;
@@ -364,8 +385,11 @@
 
     function filterWeekly() {
       const q = document.getElementById("weeklySearchInput").value.toLowerCase();
-      const filtered = weeklyRows.filter(([name]) => name.toLowerCase().includes(q));
-      paintWeeklyTable(filtered);
+      paintWeeklyTable(weeklyRows.filter(([name]) => name.toLowerCase().includes(q)));
+    }
+
+    function formatQuestion(text) {
+      return text.replace("{date}", getTodayDisplay());
     }
 
     function buildDateRange(from, to) {
