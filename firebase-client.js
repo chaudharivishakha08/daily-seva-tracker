@@ -1,20 +1,24 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   arrayRemove,
   arrayUnion,
   doc,
   getDoc,
   getDocs,
-  getFirestore,
+  initializeFirestore,
   query,
   setDoc,
   updateDoc,
   collection,
   where
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp(window.CONFIG.FIREBASE_CONFIG);
-const db = getFirestore(app);
+
+// Forces Firebase to use standard network polling, bypassing local client block errors
+const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+});
 
 const META_COLLECTION = "app";
 const META_DOC = "metadata";

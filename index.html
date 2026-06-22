@@ -71,8 +71,6 @@
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
   <script type="module">
-    import { getStudents, hasSubmitted } from "./firebase-client.js";
-
     const ADMIN_PASSWORD = "ShreeSwamiSamarth@121";
     const sel = document.getElementById("studentSelect");
     const btn = document.getElementById("enterBtn");
@@ -80,6 +78,7 @@
     const pwInput = document.getElementById("pwInput");
     const pwError = document.getElementById("pwError");
     const pwToggle = document.getElementById("pwToggle");
+    let firebaseApi = null;
 
     window.addEventListener("DOMContentLoaded", initPage);
     sel.addEventListener("change", onStudentChange);
@@ -91,17 +90,38 @@
     pwToggle.addEventListener("click", togglePw);
 
     async function initPage() {
-      try {
-        const students = await getStudents();
-        students.forEach(name => {
-          const option = document.createElement("option");
-          option.value = name;
-          option.textContent = name;
-          sel.appendChild(option);
-        });
-      } catch (error) {
-        showToast("Student list load झाली नाही", "error");
+      populateStudents(CONFIG.DEFAULT_STUDENTS);
+      firebaseApi = await loadFirebaseApi();
+
+      if (firebaseApi) {
+        try {
+          const students = await firebaseApi.getStudents();
+          populateStudents(students);
+        } catch (error) {
+          console.log("Firebase student list load झाली नाही. Default list दाखवत आहे.", "info");
+        }
+      } else {
+        console.log("Firebase connect झाले नाही. Default list दाखवत आहे.", "info");
       }
+    }
+
+    async function loadFirebaseApi() {
+      try {
+        return await import("./firebase-client.js");
+      } catch (error) {
+        console.warn("Firebase client unavailable.", error);
+        return null;
+      }
+    }
+
+    function populateStudents(students) {
+      sel.options.length = 1;
+      [...new Set(students)].sort((a, b) => a.localeCompare(b)).forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        sel.appendChild(option);
+      });
     }
 
     async function onStudentChange() {
@@ -131,7 +151,15 @@
       }
 
       try {
-        const already = await hasSubmitted(name, getTodayISO());
+        if (!firebaseApi) {
+          btn.disabled = false;
+          btn.textContent = "पुढे जा →";
+          note.style.display = "none";
+          showToast("Firebase connect झाले नाही. Submit करताना पुन्हा तपासले जाईल.", "info");
+          return;
+        }
+
+        const already = await firebaseApi.hasSubmitted(name, getTodayISO());
         note.style.display = already ? "block" : "none";
         btn.disabled = already;
         btn.textContent = already ? "✓ आज उत्तर दिले" : "पुढे जा →";

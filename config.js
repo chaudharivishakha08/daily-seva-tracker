@@ -1,14 +1,14 @@
 window.CONFIG = {
   // Replace this with your Firebase web app config from Firebase Console.
-  FIREBASE_CONFIG: {
-    apiKey: "AIzaSyAjrcFjwwnolCRIvFMNwviMYhIvuvZ67oU",
-    authDomain: "daily-seva-tracker.firebaseapp.com",
-    projectId: "daily-seva-tracker",
-    storageBucket: "daily-seva-tracker.firebasestorage.app",
-    messagingSenderId: "986908669626",
-    appId: "1:986908669626:web:4e5d0d0bf56af691617483",
-    measurementId: "G-QCFJR9G2TX"
-  },
+  FIREBASE_CONFIG:  {
+  apiKey: "AIzaSyDwyiWjbdjwELChhDuR5TadGFJxvOHPYgk",
+  authDomain: "daily-seva-tracker-e536d.firebaseapp.com",
+  projectId: "daily-seva-tracker-e536d",
+  storageBucket: "daily-seva-tracker-e536d.firebasestorage.app",
+  messagingSenderId: "60811160636",
+  appId: "1:60811160636:web:c7489e358eba013800a739",
+  measurementId: "G-QCFJR9G2TX"
+},
 
   ADMINS: ["Narendra Chaudhari", "Vishakha Chaudhari"],
 
@@ -21,7 +21,31 @@ window.CONFIG = {
     "Hirnya Thakare",
     "Himanshi Jadhav",
     "Shravani Panmand",
-    "Shruti Garud"
+    "Shruti Garud",
+    "Kanchan",
+    "Disha Kokane",
+    "Goyank Kurkure",
+    "Himanshi Jadhav",
+    "Hirnya Thakare",
+    "Shravani Panmand",
+    "Shruti Garud",
+    "Nishna",
+    "Shravani Pardeshi",
+    "Sukruta",
+    "Swara",
+    "Trisha",
+    "Arya",
+    "Jay",
+    "Krishna",
+    "Mansi",
+    "Meenal",
+    "Shlok Mhatre",
+    "Prasad",
+    "Shreyash",
+    "Tejas",
+    "Tulya",
+    "Yukta"
+
   ],
 
   POLL_QUESTIONS: [
