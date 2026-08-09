@@ -10,7 +10,7 @@ window.CONFIG = {
   measurementId: "G-QCFJR9G2TX"
 },
 
-  ADMINS: ["Narendra Chaudhari", "Vishakha Chaudhari"],
+  ADMINS: ["Narendra Chaudhari", "Vishakha"],
 
   DEFAULT_STUDENTS: [
     "Narendra Chaudhari",

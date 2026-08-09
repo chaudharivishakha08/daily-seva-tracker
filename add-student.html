@@ -24,10 +24,24 @@
     .student-item .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
     .tag-new { background: #DCFCE7; color: #166534; }
     .tag-admin { background: #FEF3C7; color: #92400E; }
-    .del-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-light); padding: 4px; border-radius: 6px; transition: all 0.15s; }
+    .student-actions { display: flex; align-items: center; gap: 6px; }
+    .edit-btn, .del-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; font-size: 1rem; font-weight: 700; color: var(--text-light); padding: 0; border-radius: 8px; transition: all 0.15s; }
+    .edit-btn svg, .modal-icon svg { width: 18px; height: 18px; display: block; }
+    .edit-btn:hover { background: #DBEAFE; color: #1D4ED8; }
     .del-btn:hover { background: #FEE2E2; color: var(--danger); }
     .denied { text-align: center; padding: 60px 20px; color: var(--danger); }
     .denied span { font-size: 3rem; display: block; margin-bottom: 12px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(28, 10, 0, 0.48); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 9998; }
+    .modal-overlay.show { display: flex; }
+    .student-modal { width: min(420px, 100%); background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); padding: 24px; }
+    .modal-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; background: var(--saffron-bg); color: var(--saffron); font-size: 1.25rem; }
+    .modal-title { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+    .modal-text { font-size: 0.86rem; line-height: 1.55; color: var(--text-light); margin-bottom: 16px; }
+    .modal-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: "Inter", sans-serif; font-size: 0.95rem; color: var(--text-dark); background: var(--cream); outline: none; margin-bottom: 18px; }
+    .modal-input:focus { border-color: var(--saffron); background: white; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-danger { background: var(--danger); color: white; box-shadow: 0 3px 12px rgba(220,38,38,0.28); }
+    .modal-danger:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(220,38,38,0.34); }
   </style>
 </head>
 <body>
@@ -57,8 +71,8 @@
             <strong style="color:var(--text-mid);">नोंद:</strong><br/>
             • नवीन विद्यार्थ्याचे नाव टाका आणि जोडा<br/>
             • हे नाव सर्व users च्या dropdown मध्ये दिसेल<br/>
-            • Delete बटनाने extra student काढता येईल<br/>
-            • Default विद्यार्थ्यांचे नाव काढता येत नाही
+            • Delete बटनाने student काढता येईल<br/>
+            • Rename केल्यावर old records new name सोबत राहतील
           </div>
         </div>
 
@@ -74,13 +88,51 @@
   </div>
 
   <div class="toast" id="toast"></div>
+  <div class="modal-overlay" id="studentModal" aria-hidden="true">
+    <div class="student-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-title" id="modalTitle">Rename student</div>
+      <div class="modal-text" id="modalText"></div>
+      <input class="modal-input" type="text" id="modalNameInput" placeholder="विद्यार्थ्याचे नाव..."/>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" type="button" id="modalCancelBtn">Cancel</button>
+        <button class="btn btn-primary btn-sm" type="button" id="modalConfirmBtn">Save</button>
+      </div>
+    </div>
+  </div>
   <script src="config.js"></script>
   <script type="module">
-    import { addStudentRecord, deleteStudentRecord, getStudents } from "./firebase-client.js";
+    import { addStudentRecord, deleteStudentRecord, getStudents, renameStudentRecord } from "./firebase-client.js";
+
+    const modal = document.getElementById("studentModal");
+    const modalIcon = document.getElementById("modalIcon");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalNameInput = document.getElementById("modalNameInput");
+    const modalCancelBtn = document.getElementById("modalCancelBtn");
+    const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+    let activeModal = null;
+    const editIconSvg = `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M4.75 3.5h10.5v2H5.5v13h13V8.75h2v10.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25V4.75c0-.69.56-1.25 1.25-1.25Z"/>
+        <path fill="currentColor" d="m8.3 14.95.58-3.08 8.53-8.53a1.68 1.68 0 0 1 2.38 0l.87.87c.66.66.66 1.72 0 2.38l-8.53 8.53-3.08.58a.65.65 0 0 1-.75-.75Zm3.05-1.68 6.97-6.97-1.62-1.62-6.97 6.97-.32 1.94 1.94-.32Z"/>
+      </svg>
+    `;
 
     document.getElementById("addBtn").addEventListener("click", addStudent);
     document.getElementById("newName").addEventListener("keydown", event => {
       if (event.key === "Enter") addStudent();
+    });
+    modalCancelBtn.addEventListener("click", () => closeStudentModal());
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closeStudentModal();
+    });
+    modalNameInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") confirmStudentModal();
+    });
+    modalConfirmBtn.addEventListener("click", confirmStudentModal);
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && modal.classList.contains("show")) closeStudentModal();
     });
 
     window.addEventListener("DOMContentLoaded", async () => {
@@ -123,31 +175,130 @@
         const isDefault = CONFIG.DEFAULT_STUDENTS.includes(name);
         const item = document.createElement("div");
         item.className = "student-item";
-        item.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:1rem;"></span>
-            <span class="name">${name}</span>
-            ${isAdminUser ? '<span class="tag tag-admin">Admin</span>' : ""}
-            ${!isDefault ? '<span class="tag tag-new">New</span>' : ""}
-          </div>
-          ${!isDefault ? `<button class="del-btn" data-name="${name.replace(/"/g, "&quot;")}">🗑</button>` : '<span style="width:28px;"></span>'}
-        `;
+
+        const nameWrap = document.createElement("div");
+        nameWrap.style.display = "flex";
+        nameWrap.style.alignItems = "center";
+        nameWrap.style.gap = "10px";
+
+        const icon = document.createElement("span");
+        icon.style.fontSize = "1rem";
+        const nameEl = document.createElement("span");
+        nameEl.className = "name";
+        nameEl.textContent = name;
+        nameWrap.append(icon, nameEl);
+
+        if (isAdminUser) {
+          const adminTag = document.createElement("span");
+          adminTag.className = "tag tag-admin";
+          adminTag.textContent = "Admin";
+          nameWrap.appendChild(adminTag);
+        }
+
+        if (!isDefault) {
+          const newTag = document.createElement("span");
+          newTag.className = "tag tag-new";
+          newTag.textContent = "New";
+          nameWrap.appendChild(newTag);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "student-actions";
+
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "edit-btn";
+        editButton.innerHTML = editIconSvg;
+        editButton.title = "Rename";
+        editButton.setAttribute("aria-label", `Rename ${name}`);
+        editButton.addEventListener("click", () => openRenameModal(name));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "del-btn";
+        deleteButton.textContent = "🗑";
+        deleteButton.title = "Delete";
+        deleteButton.setAttribute("aria-label", `Delete ${name}`);
+        deleteButton.addEventListener("click", () => openDeleteModal(name));
+
+        actions.append(editButton, deleteButton);
+        item.append(nameWrap, actions);
         list.appendChild(item);
       });
+    }
 
-      list.querySelectorAll(".del-btn").forEach(button => {
-        button.addEventListener("click", async () => {
-          const name = button.getAttribute("data-name");
-          if (!confirm(`"${name}" काढायचे का?`)) return;
-          try {
-            await deleteStudentRecord(name);
-            showToast(`"${name}" काढले`);
-            await renderList();
-          } catch (error) {
-            showToast(error.message || "Student delete झाला नाही", "error");
-          }
-        });
-      });
+    function openRenameModal(name) {
+      activeModal = { type: "rename", name };
+      modalIcon.innerHTML = editIconSvg;
+      modalTitle.textContent = "Rename student";
+      modalText.textContent = `Update "${name}". Old records will stay with the new name.`;
+      modalNameInput.style.display = "block";
+      modalNameInput.value = name;
+      modalConfirmBtn.textContent = "Save";
+      modalConfirmBtn.className = "btn btn-primary btn-sm";
+      openStudentModal();
+      modalNameInput.focus();
+      modalNameInput.select();
+    }
+
+    function openDeleteModal(name) {
+      activeModal = { type: "delete", name };
+      modalIcon.textContent = "🗑";
+      modalTitle.textContent = "Delete student";
+      modalText.textContent = `Remove "${name}" from the student list? Old records will not be deleted.`;
+      modalNameInput.style.display = "none";
+      modalNameInput.value = "";
+      modalConfirmBtn.textContent = "Delete";
+      modalConfirmBtn.className = "btn btn-sm modal-danger";
+      openStudentModal();
+      modalConfirmBtn.focus();
+    }
+
+    function openStudentModal() {
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeStudentModal(force = false) {
+      if (modalConfirmBtn.disabled && !force) return;
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+      activeModal = null;
+    }
+
+    async function confirmStudentModal() {
+      if (!activeModal || modalConfirmBtn.disabled) return;
+
+      const { type, name } = activeModal;
+      const nextName = modalNameInput.value.trim();
+      if (type === "rename" && !nextName) {
+        showToast("कृपया नाव टाका", "error");
+        modalNameInput.focus();
+        return;
+      }
+      if (type === "rename" && nextName === name) {
+        closeStudentModal();
+        return;
+      }
+
+      modalConfirmBtn.disabled = true;
+      modalCancelBtn.disabled = true;
+      try {
+        if (type === "rename") {
+          await renameStudentRecord(name, nextName);
+          showToast(`"${name}" renamed to "${nextName}"`);
+        } else {
+          await deleteStudentRecord(name);
+          showToast(`"${name}" काढले`);
+        }
+        closeStudentModal(true);
+        await renderList();
+      } catch (error) {
+        showToast(error.message || (type === "rename" ? "Student rename झाला नाही" : "Student delete झाला नाही"), "error");
+      } finally {
+        modalConfirmBtn.disabled = false;
+        modalCancelBtn.disabled = false;
+      }
     }
   </script>
 </body>
