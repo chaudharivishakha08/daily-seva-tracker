@@ -13,9 +13,9 @@
     .logo h1 { font-family: "Tiro Devanagari Marathi", serif; font-size: 2.5rem; color: var(--saffron); }
     .logo .bar { width: 50px; height: 3px; background: linear-gradient(90deg, var(--saffron-light), var(--saffron)); border-radius: 4px; margin: 12px auto 0; }
     .btn-primary { width: 100%; margin-top: 4px; }
-    .admin-links { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-    .admin-links a { font-size: 0.78rem; color: var(--text-light); text-decoration: none; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); transition: all 0.15s; }
-    .admin-links a:hover { background: var(--saffron-bg); color: var(--saffron); border-color: var(--saffron-light); }
+    .admin-access { display: none; margin-top: 14px; }
+    .admin-access .btn { width: 100%; }
+    .admin-note { color: var(--text-light); font-size: .78rem; line-height: 1.45; margin-bottom: 8px; }
     .already-note { margin-top: 12px; padding: 10px 14px; background: var(--success-bg); border: 1px solid #86EFAC; border-radius: var(--r-sm); font-size: 0.83rem; color: var(--success); font-weight: 500; display: none; text-align: center; }
     .password-wrap { display: none; margin-bottom: 4px; animation: fadeIn 0.25s ease both; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
@@ -47,6 +47,7 @@
     </div>
 
     <div class="password-wrap" id="passwordWrap">
+      <div class="admin-note">You are an admin. Enter your password to see Admin Options.</div>
       <label>पासवर्ड / Password</label>
       <div class="pw-input-row">
         <input type="password" id="pwInput" placeholder="पासवर्ड टाका..." />
@@ -61,11 +62,7 @@
       पुढे जा →
     </button>
 
-    <div class="admin-links" id="adminLinks" style="display:none;">
-      <a href="daily.html">📅 Daily View</a>
-      <a href="results.html">📊 Results</a>
-      <a href="add-student.html">➕ Add Student</a>
-    </div>
+    <div class="admin-access" id="adminAccess"><button class="btn btn-ghost" id="seeAdminBtn" type="button">See Admin Options</button></div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -78,6 +75,7 @@
     const pwInput = document.getElementById("pwInput");
     const pwError = document.getElementById("pwError");
     const pwToggle = document.getElementById("pwToggle");
+    const seeAdminBtn = document.getElementById("seeAdminBtn");
     let firebaseApi = null;
 
     window.addEventListener("DOMContentLoaded", initPage);
@@ -88,6 +86,7 @@
     });
     btn.addEventListener("click", go);
     pwToggle.addEventListener("click", togglePw);
+    seeAdminBtn.addEventListener("click", () => { window.location.href = "admin.html"; });
 
     async function initPage() {
       populateStudents(CONFIG.DEFAULT_STUDENTS);
@@ -127,14 +126,15 @@
     async function onStudentChange() {
       const name = sel.value;
       const note = document.getElementById("alreadyNote");
-      const adminLinks = document.getElementById("adminLinks");
+      const adminAccess = document.getElementById("adminAccess");
 
       pwWrap.style.display = "none";
       pwInput.value = "";
       pwInput.classList.remove("error");
       pwError.style.display = "none";
-      adminLinks.style.display = "none";
+      adminAccess.style.display = "none";
       sessionStorage.removeItem("currentStudent");
+      sessionStorage.removeItem("adminAuthorized");
 
       if (!name) {
         btn.disabled = true;
@@ -144,8 +144,7 @@
 
       if (CONFIG.ADMINS.includes(name)) {
         pwWrap.style.display = "block";
-        pwInput.focus();
-        btn.disabled = true;
+        btn.disabled = false;
         note.style.display = "none";
         return;
       }
@@ -173,16 +172,13 @@
       const name = sel.value;
       pwInput.classList.remove("error");
       pwError.style.display = "none";
-
       if (pwInput.value === ADMIN_PASSWORD) {
         sessionStorage.setItem("currentStudent", name);
-        btn.disabled = false;
-        btn.textContent = "पुढे जा →";
-        document.getElementById("adminLinks").style.display = "flex";
+        sessionStorage.setItem("adminAuthorized", "true");
+        document.getElementById("adminAccess").style.display = "block";
       } else {
-        sessionStorage.removeItem("currentStudent");
-        btn.disabled = true;
-        document.getElementById("adminLinks").style.display = "none";
+        sessionStorage.removeItem("adminAuthorized");
+        document.getElementById("adminAccess").style.display = "none";
       }
     }
 
@@ -195,14 +191,8 @@
       const name = sel.value;
       if (!name) return;
 
-      if (CONFIG.ADMINS.includes(name) && pwInput.value !== ADMIN_PASSWORD) {
-        pwInput.classList.add("error");
-        pwError.style.display = "block";
-        pwInput.focus();
-        return;
-      }
-
       sessionStorage.setItem("currentStudent", name);
+      if (!CONFIG.ADMINS.includes(name)) sessionStorage.removeItem("adminAuthorized");
       window.location.href = "poll.html";
     } 
   </script>

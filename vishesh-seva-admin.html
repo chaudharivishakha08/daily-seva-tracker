@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Vishesh Seva</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }.page { width:min(760px,100%); margin:0 auto; padding:28px 20px 42px; }.form-card,.list-card { position:relative; overflow:hidden; padding:24px; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--white); box-shadow:var(--shadow); }.form-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,var(--saffron),var(--saffron-dark)); }.form-card h1 { color:var(--text-dark); font-size:1.1rem; margin-bottom:6px; }.form-card p { color:var(--text-light); font-size:.85rem; line-height:1.55; margin-bottom:18px; }.form-card .field { margin-bottom:12px; }.form-card .btn { width:100%; }.list-card { margin-top:18px; padding:0; }.list-head { display:flex; align-items:center; justify-content:space-between; padding:17px 20px; border-bottom:1px solid var(--border); }.list-head h2 { color:var(--text-mid); font-size:1rem; }.list-count { color:var(--text-light); font-size:.8rem; }.option-row { display:grid; grid-template-columns:minmax(145px,.32fr) 1fr; gap:16px; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); }.option-row:last-child { border-bottom:0; }.option-id { width:max-content; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:6px 9px; border:1px solid var(--saffron-light); border-radius:7px; background:var(--saffron-bg); color:var(--saffron-dark); font-size:.75rem; font-weight:800; }.option-text { font-family:"Tiro Devanagari Marathi",serif; line-height:1.5; }.empty,.denied { padding:50px 20px; text-align:center; color:var(--text-light); }.denied { color:var(--danger); }
+    @media (max-width:550px) { .page { padding:20px 14px 32px; }.form-card { padding:22px 18px; }.option-row { grid-template-columns:1fr; gap:8px; padding:14px; }.option-id { max-width:100%; } }
+  </style>
+</head>
+<body>
+  <div class="top-bar"><button class="icon-btn" onclick="window.location.href='admin.html'">← Back</button><span class="top-bar-title">Add Vishesh Seva</span><div style="width:80px"></div></div>
+  <main class="page">
+    <section id="denied" class="denied" hidden>Only administrators can manage Vishesh Seva options.</section>
+    <div id="content" hidden>
+      <section class="form-card"><h1>Add Vishesh Seva option</h1><p>Enter a unique option ID and its text. It will immediately appear in the Vishesh Seva poll for everyone.</p><div class="field"><input id="optionId" maxlength="40" placeholder="Option ID (e.g. VS1)"/></div><div class="field"><input id="optionLabel" maxlength="300" placeholder="Option text"/></div><button class="btn btn-primary" id="addBtn" type="button">Add option</button></section>
+      <section class="list-card"><div class="list-head"><h2>Available Vishesh Seva options</h2><span class="list-count" id="optionCount">0 options</span></div><div id="optionList"></div></section>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="config.js"></script>
+  <script type="module">
+    import { addVisheshSevaOption, getVisheshSevaOptions } from "./firebase-client.js";
+    document.getElementById("addBtn").addEventListener("click", addOption);
+    document.getElementById("optionLabel").addEventListener("keydown", event => { if (event.key === "Enter") addOption(); });
+    if (!isAdmin()) document.getElementById("denied").hidden = false;
+    else { document.getElementById("content").hidden = false; loadOptions(); }
+    async function addOption() { const button = document.getElementById("addBtn"); button.disabled = true; try { await addVisheshSevaOption(document.getElementById("optionId").value, document.getElementById("optionLabel").value); document.getElementById("optionId").value = ""; document.getElementById("optionLabel").value = ""; await loadOptions(); showToast("✓ Vishesh Seva option added"); } catch (error) { showToast(error.message || "Option could not be added", "error"); } finally { button.disabled = false; } }
+    async function loadOptions() { try { const options = await getVisheshSevaOptions(); document.getElementById("optionCount").textContent = `${options.length} option${options.length === 1 ? "" : "s"}`; document.getElementById("optionList").innerHTML = options.length ? options.map(option => `<div class="option-row"><span class="option-id">${escapeHTML(option.id)}</span><span class="option-text">${escapeHTML(option.label)}</span></div>`).join("") : '<div class="empty">No Vishesh Seva options yet.</div>'; } catch (error) { showToast(error.message || "Options could not be loaded", "error"); } }
+    function escapeHTML(value) { const node = document.createElement("div"); node.textContent = value; return node.innerHTML; }
+  </script>
+</body>
+</html>

@@ -3,9 +3,11 @@ import {
   arrayRemove,
   arrayUnion,
   doc,
+  deleteDoc,
   getDoc,
   getDocs,
   initializeFirestore,
+  addDoc,
   query,
   setDoc,
   updateDoc,
@@ -24,6 +26,8 @@ const db = initializeFirestore(app, {
 const META_COLLECTION = "app";
 const META_DOC = "metadata";
 const RESPONSES_COLLECTION = "responses";
+const YUVA_PRABODHAN_SEVA_COLLECTION = "yuva_prabodhan_seva";
+const YUVA_PRABODHAN_SEVA_OPTIONS_COLLECTION = "yuva_prabodhan_seva_options";
 
 function normalizeStudentKey(name) {
   return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -37,8 +41,8 @@ async function ensureMetadataDoc() {
   const ref = doc(db, META_COLLECTION, META_DOC);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
-    await setDoc(ref, { extraStudents: [], removedStudents: [], studentAliases: [] });
-    return { extraStudents: [], removedStudents: [], studentAliases: [] };
+    await setDoc(ref, { extraStudents: [], removedStudents: [], studentAliases: [], visheshSevaOptions: [] });
+    return { extraStudents: [], removedStudents: [], studentAliases: [], visheshSevaOptions: [] };
   }
   return snap.data();
 }
@@ -183,6 +187,112 @@ export async function getResponsesByDate(date) {
   return applyStudentAliases(snapshot.docs
     .map(entry => entry.data())
     .sort((a, b) => a.studentName.localeCompare(b.studentName)), meta, students);
+}
+
+export async function getVisheshSevaOptions() {
+  const meta = await ensureMetadataDoc();
+  const options = Array.isArray(meta.visheshSevaOptions) ? meta.visheshSevaOptions : [];
+  return options
+    .filter(option => option && typeof option.id === "string" && typeof option.label === "string")
+    .sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export async function addVisheshSevaOption(id, label) {
+  const optionId = id.trim();
+  const optionLabel = label.trim();
+  if (!optionId || !optionLabel) throw new Error("Option ID and text are required");
+
+  const meta = await ensureMetadataDoc();
+  const options = Array.isArray(meta.visheshSevaOptions) ? meta.visheshSevaOptions : [];
+  if (options.some(option => option?.id?.toLowerCase() === optionId.toLowerCase())) {
+    throw new Error("An option with this ID already exists");
+  }
+
+  await setDoc(doc(db, META_COLLECTION, META_DOC), {
+    visheshSevaOptions: [...options, { id: optionId, label: optionLabel }]
+  }, { merge: true });
+}
+
+export async function updateVisheshSevaOption(currentId, id, label) {
+  const oldId = currentId.trim();
+  const optionId = id.trim();
+  const optionLabel = label.trim();
+  if (!optionId || !optionLabel) throw new Error("Option ID and text are required");
+
+  const meta = await ensureMetadataDoc();
+  const options = Array.isArray(meta.visheshSevaOptions) ? meta.visheshSevaOptions : [];
+  if (!options.some(option => option?.id === oldId)) throw new Error("Option no longer exists");
+  if (options.some(option => option?.id?.toLowerCase() === optionId.toLowerCase() && option.id !== oldId)) {
+    throw new Error("An option with this ID already exists");
+  }
+
+  await setDoc(doc(db, META_COLLECTION, META_DOC), {
+    visheshSevaOptions: options.map(option => option.id === oldId ? { id: optionId, label: optionLabel } : option)
+  }, { merge: true });
+}
+
+export async function deleteVisheshSevaOption(id) {
+  const optionId = id.trim();
+  const meta = await ensureMetadataDoc();
+  const options = Array.isArray(meta.visheshSevaOptions) ? meta.visheshSevaOptions : [];
+  if (!options.some(option => option?.id === optionId)) throw new Error("Option no longer exists");
+
+  await setDoc(doc(db, META_COLLECTION, META_DOC), {
+    visheshSevaOptions: options.filter(option => option.id !== optionId)
+  }, { merge: true });
+}
+
+export async function addYuvaPrabodhanSevaOption(id, text) {
+  const sevaId = id.trim();
+  const sevaText = text.trim();
+  if (!sevaId || !sevaText) throw new Error("Seva ID and text are required");
+  await setDoc(doc(db, YUVA_PRABODHAN_SEVA_OPTIONS_COLLECTION, sevaId), { id: sevaId, text: sevaText });
+}
+
+export async function getYuvaPrabodhanSevaOptions() {
+  const snapshot = await getDocs(collection(db, YUVA_PRABODHAN_SEVA_OPTIONS_COLLECTION));
+  return snapshot.docs
+    .map(entry => entry.data())
+    .filter(entry => typeof entry.id === "string" && typeof entry.text === "string")
+    .sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export async function addYuvaPrabodhanSevaRecord(id, count, date) {
+  const sevaId = id.trim();
+  const sevaCount = Number(count);
+  const sevaDate = date.trim();
+  if (!sevaId) throw new Error("Seva ID is required");
+  if (!Number.isFinite(sevaCount) || sevaCount <= 0) throw new Error("Count must be greater than zero");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(sevaDate)) throw new Error("A valid date is required");
+
+  await addDoc(collection(db, YUVA_PRABODHAN_SEVA_COLLECTION), {
+    id: sevaId,
+    count: sevaCount,
+    date: sevaDate,
+    time: new Date().toISOString()
+  });
+}
+
+export async function getYuvaPrabodhanSevaRecords() {
+  const snapshot = await getDocs(collection(db, YUVA_PRABODHAN_SEVA_COLLECTION));
+  return snapshot.docs
+    .map(entry => ({ documentId: entry.id, ...entry.data() }))
+    .filter(entry => typeof entry.id === "string" && Number.isFinite(Number(entry.count)));
+}
+
+export async function updateYuvaPrabodhanSevaRecord(documentId, id, count, date) {
+  const sevaId = id.trim();
+  const sevaCount = Number(count);
+  const sevaDate = date.trim();
+  if (!documentId || !sevaId) throw new Error("Seva record and ID are required");
+  if (!Number.isFinite(sevaCount) || sevaCount <= 0) throw new Error("Count must be greater than zero");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(sevaDate)) throw new Error("A valid date is required");
+  await updateDoc(doc(db, YUVA_PRABODHAN_SEVA_COLLECTION, documentId), { id: sevaId, count: sevaCount, date: sevaDate });
+}
+
+export async function deleteYuvaPrabodhanSevaRecord(documentId) {
+  if (!documentId) throw new Error("Seva record is required");
+  await deleteDoc(doc(db, YUVA_PRABODHAN_SEVA_COLLECTION, documentId));
 }
 
 export async function getResponsesByRange(from, to) {

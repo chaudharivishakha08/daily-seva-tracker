@@ -99,7 +99,7 @@ window.getTodayISO = function getTodayISO() {
 
 window.isAdmin = function isAdmin() {
   const u = sessionStorage.getItem("currentStudent");
-  return u && window.CONFIG.ADMINS.includes(u);
+  return u && window.CONFIG.ADMINS.includes(u) && sessionStorage.getItem("adminAuthorized") === "true";
 };
 
 window.showToast = function showToast(msg, type = "") {

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vishesh Seva Analytics</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .page { width:min(980px,100%); margin:0 auto; padding:28px 20px 42px; }
+    .page-title { font-size:1.35rem; color:var(--text-dark); margin-bottom:5px; }.page-intro { color:var(--text-light); font-size:.88rem; margin-bottom:20px; }
+    .view-tabs { display:flex; gap:8px; margin-bottom:18px; padding:5px; border:1px solid var(--border); border-radius:var(--r); background:var(--white); width:max-content; }.view-tab { border:0; border-radius:9px; padding:9px 14px; background:transparent; color:var(--text-mid); font:700 .82rem "Inter",sans-serif; cursor:pointer; }.view-tab.active { background:linear-gradient(135deg,var(--saffron),var(--saffron-dark)); color:white; }
+    .filters { display:flex; align-items:flex-end; gap:12px; padding:18px; margin-bottom:18px; }.filters .field { flex:1; margin:0; }.filters .btn { height:43px; }
+    .summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:18px; }.summary-card { padding:18px; }.summary-label { color:var(--text-light); font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }.summary-value { color:var(--saffron-dark); font-size:1.7rem; font-weight:800; margin-top:5px; }
+    .analytics-card { overflow:hidden; }.analytics-head { padding:18px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:12px; }.analytics-head h2 { font-size:1rem; color:var(--text-mid); }.range-note { color:var(--text-light); font-size:.8rem; }
+    .option-list { display:grid; }.option-row { display:grid; grid-template-columns:minmax(140px,.3fr) 1fr auto; gap:16px; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); }.option-row:last-child { border-bottom:0; }.option-id { width:max-content; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:6px 10px; border:1px solid var(--saffron-light); border-radius:7px; background:var(--saffron-bg); color:var(--saffron-dark); font-size:.75rem; font-weight:800; }.option-text { font-family:"Tiro Devanagari Marathi",serif; line-height:1.5; }.count { min-width:72px; padding:8px 10px; border-radius:20px; background:var(--success-bg); color:var(--success); font-size:.85rem; font-weight:800; text-align:center; }.empty { padding:40px 20px; text-align:center; color:var(--text-light); }.denied { text-align:center; padding:80px 20px; color:var(--danger); }.denied strong { display:block; font-size:1.2rem; margin-bottom:8px; }
+    .student-table-wrap { overflow:auto; }.student-table { width:100%; min-width:760px; border-collapse:collapse; }.student-table th,.student-table td { padding:12px 14px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; }.student-table th { background:var(--saffron-bg); color:var(--text-mid); font-size:.76rem; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; }.student-table th:first-child { position:sticky; left:0; z-index:1; }.student-table td:first-child { position:sticky; left:0; background:white; z-index:1; font-size:.86rem; font-weight:700; white-space:nowrap; }.student-table tr:last-child td { border-bottom:0; }.selected-ids { display:flex; flex-wrap:wrap; gap:4px; min-width:72px; }.selected-id { padding:4px 6px; border-radius:5px; background:var(--saffron-bg); color:var(--saffron-dark); font-size:.67rem; font-weight:800; white-space:nowrap; }.no-selection { color:var(--text-light); font-size:.8rem; }
+    @media (max-width:620px) { .page { padding:20px 14px 32px; }.filters { display:grid; grid-template-columns:1fr; }.filters .btn { width:100%; }.summary { gap:10px; }.summary-card { padding:14px; }.summary-value { font-size:1.35rem; }.option-row { grid-template-columns:1fr auto; gap:8px 12px; padding:14px; }.option-text { grid-column:1 / -1; grid-row:2; }.option-id { max-width:210px; } }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="icon-btn" onclick="window.location.href='index.html'">← Back</button>
+    <span class="top-bar-title">Vishesh Seva Analytics</span>
+    <div style="width:80px"></div>
+  </div>
+  <main class="page">
+    <section id="denied" class="denied" hidden><strong>Access denied</strong>Only administrators can view Vishesh Seva Analytics.</section>
+    <div id="content" hidden>
+      <h1 class="page-title">Vishesh Seva Analytics</h1>
+      <p class="page-intro">See how many times each Vishesh Seva option was selected during a chosen date range.</p>
+      <nav class="view-tabs" aria-label="Analytics views"><button class="view-tab active" type="button" data-view="summary">Option Summary</button><button class="view-tab" type="button" data-view="students">Student Specific</button></nav>
+      <section class="card filters">
+        <div class="field"><label for="fromDate">From date</label><input id="fromDate" type="date"/></div>
+        <div class="field"><label for="toDate">To date</label><input id="toDate" type="date"/></div>
+        <button class="btn btn-primary" id="applyBtn" type="button">Show analytics</button>
+      </section>
+      <section class="summary" id="summaryStats">
+        <div class="card summary-card"><div class="summary-label">Total selections</div><div class="summary-value" id="totalSelections">0</div></div>
+        <div class="card summary-card"><div class="summary-label">Responses with Vishesh Seva</div><div class="summary-value" id="responseCount">0</div></div>
+      </section>
+      <section class="card analytics-card" id="summaryView">
+        <div class="analytics-head"><h2>Options</h2><span class="range-note" id="rangeNote"></span></div>
+        <div class="option-list" id="optionList"></div>
+      </section>
+      <section class="card analytics-card" id="studentView" hidden>
+        <div class="analytics-head"><h2>Student-specific Vishesh Seva</h2><span class="range-note" id="studentRangeNote"></span></div>
+        <div class="student-table-wrap" id="studentTableWrap"></div>
+      </section>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="config.js"></script>
+  <script type="module">
+    import { getResponsesByRange, getStudents, getVisheshSevaOptions } from "./firebase-client.js";
+
+    const today = getTodayISO();
+    document.getElementById("fromDate").value = today.slice(0, 8) + "01";
+    document.getElementById("toDate").value = today;
+    document.getElementById("applyBtn").addEventListener("click", loadAnalytics);
+    document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.view)));
+    let activeView = "summary";
+    let latestData = { options: [], responses: [], students: [], from: "", to: "" };
+
+    if (!isAdmin()) {
+      document.getElementById("denied").hidden = false;
+    } else {
+      document.getElementById("content").hidden = false;
+      loadAnalytics();
+    }
+
+    async function loadAnalytics() {
+      const from = document.getElementById("fromDate").value;
+      const to = document.getElementById("toDate").value;
+      if (!from || !to || from > to) {
+        showToast("Choose a valid date range", "error");
+        return;
+      }
+      const button = document.getElementById("applyBtn");
+      button.disabled = true;
+      try {
+        const [options, responses, students] = await Promise.all([getVisheshSevaOptions(), getResponsesByRange(from, to), getStudents()]);
+        const counts = new Map(options.map(option => [option.id, 0]));
+        let responseCount = 0;
+        let totalSelections = 0;
+        responses.forEach(response => {
+          const answer = Array.isArray(response.answers) && response.answers.find(item => item.questionId === "vishesh_seva");
+          const selectedIds = Array.isArray(answer?.selectedOptionIds) ? answer.selectedOptionIds : [];
+          if (selectedIds.length) responseCount += 1;
+          selectedIds.forEach(id => {
+            counts.set(id, (counts.get(id) || 0) + 1);
+            totalSelections += 1;
+          });
+        });
+        document.getElementById("totalSelections").textContent = totalSelections;
+        document.getElementById("responseCount").textContent = responseCount;
+        document.getElementById("rangeNote").textContent = `${from} to ${to}`;
+        renderOptions(options, counts);
+        latestData = { options, responses, students, from, to };
+        renderStudentTable();
+      } catch (error) {
+        showToast(error.message || "Analytics could not be loaded", "error");
+      } finally { button.disabled = false; }
+    }
+
+    function renderOptions(options, counts) {
+      const list = document.getElementById("optionList");
+      if (!options.length) {
+        list.innerHTML = '<div class="empty">No Vishesh Seva options have been added.</div>';
+        return;
+      }
+      list.innerHTML = options.map(option => `<div class="option-row"><span class="option-id" title="${escapeHTML(option.id)}">${escapeHTML(option.id)}</span><span class="option-text">${escapeHTML(option.label)}</span><span class="count">${counts.get(option.id) || 0} selected</span></div>`).join("");
+    }
+
+    function switchView(view) {
+      activeView = view;
+      document.querySelectorAll("[data-view]").forEach(button => button.classList.toggle("active", button.dataset.view === view));
+      document.getElementById("summaryStats").hidden = view !== "summary";
+      document.getElementById("summaryView").hidden = view !== "summary";
+      document.getElementById("studentView").hidden = view !== "students";
+      if (view === "students") renderStudentTable();
+    }
+
+    function renderStudentTable() {
+      const { responses, students, from, to } = latestData;
+      if (!from || !to) return;
+      const dates = buildDates(from, to);
+      const responseNames = responses.map(response => response.studentName);
+      const names = [...new Set([...students, ...responseNames])].sort((a, b) => a.localeCompare(b));
+      const selections = new Map();
+      responses.forEach(response => {
+        const answer = Array.isArray(response.answers) && response.answers.find(item => item.questionId === "vishesh_seva");
+        selections.set(`${response.studentName}|||${response.date}`, Array.isArray(answer?.selectedOptionIds) ? answer.selectedOptionIds : []);
+      });
+      document.getElementById("studentRangeNote").textContent = `${from} to ${to}`;
+      const wrap = document.getElementById("studentTableWrap");
+      if (!names.length) {
+        wrap.innerHTML = '<div class="empty">No students found.</div>';
+        return;
+      }
+      wrap.innerHTML = `<table class="student-table"><thead><tr><th>Student</th>${dates.map(date => `<th>${formatDate(date)}</th>`).join("")}</tr></thead><tbody>${names.map(name => `<tr><td>${escapeHTML(name)}</td>${dates.map(date => { const ids = selections.get(`${name}|||${date}`) || []; return `<td>${ids.length ? `<div class="selected-ids">${ids.map(id => `<span class="selected-id">${escapeHTML(id)}</span>`).join("")}</div>` : '<span class="no-selection">—</span>'}</td>`; }).join("")}</tr>`).join("")}</tbody></table>`;
+    }
+
+    function buildDates(from, to) {
+      const dates = [];
+      const current = new Date(`${from}T00:00:00`);
+      const end = new Date(`${to}T00:00:00`);
+      while (current <= end) {
+        dates.push(`${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`);
+        current.setDate(current.getDate() + 1);
+      }
+      return dates;
+    }
+
+    function formatDate(date) { const [year, month, day] = date.split("-"); return `${day}/${month}`; }
+
+    function escapeHTML(value) { const node = document.createElement("div"); node.textContent = value; return node.innerHTML; }
+  </script>
+</body>
+</html>

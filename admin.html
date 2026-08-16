@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Options</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }.page { width:min(980px,100%); margin:0 auto; padding:30px 20px 44px; }.heading { margin-bottom:22px; }.heading h1 { color:var(--text-dark); font-size:1.45rem; margin-bottom:6px; }.heading p { color:var(--text-light); font-size:.9rem; }.grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }.admin-card { display:flex; flex-direction:column; align-items:flex-start; min-height:155px; padding:22px; border:1px solid var(--border); border-radius:var(--r-lg); background:white; color:inherit; text-decoration:none; box-shadow:var(--shadow-sm); transition:all .16s; }.admin-card:hover { border-color:var(--saffron-light); background:var(--saffron-bg); box-shadow:var(--shadow); transform:translateY(-2px); }.card-icon { font-size:1.45rem; margin-bottom:14px; }.card-title { color:var(--text-dark); font-size:1rem; font-weight:800; }.card-text { margin-top:7px; color:var(--text-light); font-size:.82rem; line-height:1.45; }.denied { text-align:center; padding:80px 20px; color:var(--danger); }.denied h1 { margin-bottom:8px; }
+    @media (max-width:700px) { .page { padding:22px 14px 34px; }.grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }.admin-card { min-height:140px; padding:18px; } } @media (max-width:420px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="top-bar"><button class="icon-btn" onclick="window.location.href='index.html'">← Back</button><span class="top-bar-title">Admin Options</span><div style="width:80px"></div></div>
+  <main class="page">
+    <section id="denied" class="denied" hidden><h1>Access denied</h1><p>Enter the admin password from the home page to open this area.</p></section>
+    <div id="content" hidden>
+      <div class="heading"><h1>Admin Options</h1><p>Choose an area to manage the tracker.</p></div>
+      <section class="grid">
+        <a class="admin-card" href="daily.html"><span class="card-icon">📅</span><span class="card-title">Daily View</span><span class="card-text">View daily responses and seva details.</span></a>
+        <a class="admin-card" href="results.html"><span class="card-icon">📊</span><span class="card-title">Results</span><span class="card-text">Review the overall response results.</span></a>
+        <a class="admin-card" href="add-student.html"><span class="card-icon">➕</span><span class="card-title">Add Student</span><span class="card-text">Add, rename, or remove students.</span></a>
+        <a class="admin-card" href="vishesh-seva-admin.html"><span class="card-icon">✨</span><span class="card-title">Add Vishesh Seva</span><span class="card-text">Create and manage Vishesh Seva options.</span></a>
+        <a class="admin-card" href="vishesh-analytics.html"><span class="card-icon">📈</span><span class="card-title">Vishesh Analytics</span><span class="card-text">Review Vishesh Seva selections.</span></a>
+        <a class="admin-card" href="yuva-prabodhan-seva.html"><span class="card-icon">🧾</span><span class="card-title">Yuva Prabodhan Seva</span><span class="card-text">Track Yuva Prabodhan Varg seva records.</span></a>
+      </section>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script>if (isAdmin()) document.getElementById("content").hidden = false; else document.getElementById("denied").hidden = false;</script>
+</body>
+</html>

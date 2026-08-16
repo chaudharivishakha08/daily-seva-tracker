@@ -3,226 +3,333 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>श्री स्वामी समर्थ - Poll</title>
+  <title>Shri Swami Samarth - Daily Seva</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    body { display: flex; flex-direction: column; min-height: 100vh; }
-    .poll-body { flex: 1; display: flex; flex-direction: column; padding: 28px 20px 36px; max-width: 860px; width: 100%; margin: 0 auto; gap: 18px; }
-    .question-list { display: grid; gap: 16px; }
-    .question-card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 24px 26px; position: relative; overflow: hidden; cursor: pointer; transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s; }
-    .question-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: linear-gradient(180deg, var(--saffron), var(--saffron-dark)); border-radius: 4px 0 0 4px; }
-    .question-card:hover, .question-card.active { border-color: var(--saffron-light); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
-    .question-card.answered { border-color: #86EFAC; }
-    .question-card.locked { opacity: 0.72; cursor: not-allowed; }
-    .question-card.locked:hover { border-color: var(--border); box-shadow: var(--shadow); transform: none; }
-    .question-head { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
-    .question-copy { width: 100%; }
-    .q-label { font-size: 0.72rem; font-weight: 700; color: var(--saffron); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-    .q-text { font-family: "Tiro Devanagari Marathi", serif; font-size: 1.16rem; line-height: 1.7; color: var(--text-dark); }
-    .answer-pill { display: none; max-width: 100%; padding: 5px 12px; border-radius: 999px; background: var(--success-bg); border: 1px solid #86EFAC; color: var(--success); font-size: 0.78rem; font-weight: 700; line-height: 1.35; white-space: normal; overflow-wrap: anywhere; }
-    .question-card.answered .answer-pill { display: inline-flex; }
-    .answer-options { display: none; gap: 10px; margin-top: 18px; }
-    .question-card.active .answer-options { display: grid; }
-    .answer-options.compact-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .yes-no-btn { border: 1.5px solid var(--border); background: white; border-radius: var(--r); padding: 13px 14px; font-family: "Tiro Devanagari Marathi", serif; font-size: 1.05rem; color: var(--text-dark); cursor: pointer; transition: all 0.16s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .option-circle { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--saffron), var(--saffron-dark)); color: white; font-family: "Inter", sans-serif; font-size: 0.88rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-    .option-label { line-height: 1.45; }
-    .yes-no-btn.option-e .option-label { white-space: nowrap; }
-    .answer-options:not(.compact-options) .yes-no-btn { justify-content: flex-start; }
-    .answer-options:not(.compact-options) .option-label { flex: 1; text-align: center; }
-    .yes-no-btn:hover { border-color: var(--saffron-light); background: var(--saffron-bg); }
-    .yes-no-btn.selected { border-color: var(--saffron); background: linear-gradient(135deg, #FFF4EC, #FEE9CE); color: var(--saffron-dark); font-weight: 700; }
-    .submit-wrap { margin-top: 8px; }
-    .submit-wrap .btn { width: 100%; padding: 14px; font-size: 1rem; border-radius: var(--r); }
-    @media (min-width: 760px) {
-      .poll-body { padding: 36px 32px; }
-      .question-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-      .question-card { min-height: 230px; }
-      .question-card { grid-column: span 2; }
-      .question-head { flex-direction: row; justify-content: space-between; gap: 18px; }
-      .question-copy { flex: 1; min-width: 0; }
-      .answer-pill { max-width: 48%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    }
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .poll-body { flex:1; width:100%; max-width:860px; margin:0 auto; padding:28px 20px 36px; }
+    .poll-tabs { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:18px; padding:6px; border:1px solid var(--border); border-radius:var(--r); background:var(--white); box-shadow:var(--shadow-sm); }
+    .poll-tab { border:0; border-radius:10px; background:transparent; padding:11px 10px; color:var(--text-mid); font:600 .86rem "Inter",sans-serif; cursor:pointer; }
+    .poll-tab.active { color:white; background:linear-gradient(135deg,var(--saffron),var(--saffron-dark)); box-shadow:0 2px 8px rgba(194,83,10,.24); }
+    .question-card, .admin-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow); padding:24px 26px; position:relative; overflow:hidden; }
+    .question-card::before, .admin-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,var(--saffron),var(--saffron-dark)); }
+    .q-label { color:var(--saffron); font-size:.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; }
+    .q-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:18px; }.q-heading .q-text { margin-bottom:0; }
+    .q-text { font:1.16rem/1.7 "Tiro Devanagari Marathi",serif; color:var(--text-dark); margin-bottom:18px; }
+    .answer-options { display:grid; gap:10px; }
+    .answer-options.compact-options { grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .option-btn { display:flex; align-items:center; justify-content:flex-start; gap:14px; width:100%; padding:13px 16px; border:1.5px solid var(--border); border-radius:var(--r); background:white; color:var(--text-dark); cursor:pointer; font:1.02rem/1.45 "Tiro Devanagari Marathi",serif; text-align:left; transition:all .16s; }
+    .option-btn:hover { border-color:var(--saffron-light); background:var(--saffron-bg); }
+    .option-btn.selected { border-color:var(--saffron); background:linear-gradient(135deg,#FFF4EC,#FEE9CE); color:var(--saffron-dark); font-weight:700; }
+    .option-badge { display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; min-width:34px; height:34px; padding:0 8px; border-radius:50%; background:linear-gradient(135deg,var(--saffron),var(--saffron-dark)); color:#fff; font:800 .85rem "Inter",sans-serif; }
+    .vishesh-option { display:flex; align-items:center; gap:14px; width:100%; padding:13px 16px; border:1.5px solid var(--border); border-radius:var(--r); background:white; transition:all .16s; }
+    .vishesh-option:hover { border-color:var(--saffron-light); background:var(--saffron-bg); }
+    .vishesh-option.selected { border-color:var(--saffron); background:linear-gradient(135deg,#FFF4EC,#FEE9CE); }
+    .vishesh-select { border:0; background:transparent; cursor:pointer; padding:0; display:flex; align-items:center; gap:14px; min-width:0; flex:1; color:var(--text-dark); text-align:left; font:1.02rem/1.45 "Tiro Devanagari Marathi",serif; }
+    .id-chip { flex:0 0 auto; max-width:210px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:6px 10px; border-radius:7px; background:var(--saffron-bg); border:1px solid var(--saffron-light); color:var(--saffron-dark); font:800 .73rem "Inter",sans-serif; letter-spacing:.2px; }
+    .vishesh-text { min-width:0; flex:1; }
+    .option-actions { display:flex; align-items:center; gap:6px; margin-left:auto; }
+    .option-action { border:1px solid var(--border); border-radius:8px; background:white; padding:7px 9px; color:var(--text-light); font:600 .75rem "Inter",sans-serif; cursor:pointer; }.option-action:hover { border-color:var(--saffron-light); color:var(--saffron); background:var(--saffron-bg); }.option-action.delete:hover { border-color:#FCA5A5; color:var(--danger); background:#FEF2F2; }
+    .chant-btn { flex:0 0 auto; border:1px solid var(--saffron-light); border-radius:8px; background:var(--saffron-bg); color:var(--saffron-dark); padding:7px 11px; font:700 .76rem "Inter",sans-serif; cursor:pointer; }.chant-btn:hover { background:var(--saffron); border-color:var(--saffron); color:white; }
+    .nitya-option { display:flex; align-items:stretch; gap:10px; }.nitya-option .option-btn { flex:1; }.nitya-option .chant-btn { align-self:center; }
+    .check { width:24px; height:24px; border:2px solid var(--saffron-light); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; color:transparent; font:900 1rem/1 "Inter",sans-serif; }
+    .vishesh-option.selected .check { background:var(--success); border-color:var(--success); color:white; box-shadow:0 1px 3px rgba(22,163,74,.3); }
+    .empty { padding:24px; color:var(--text-light); text-align:center; border:1px dashed var(--border); border-radius:var(--r); }
+    .submit-wrap { margin-top:18px; }.submit-wrap .btn { width:100%; padding:14px; font-size:1rem; border-radius:var(--r); }
+    .admin-card { margin-top:18px; }.admin-card h2 { font-size:1rem; color:var(--text-mid); margin-bottom:6px; }.admin-card p { font-size:.84rem; color:var(--text-light); margin-bottom:14px; line-height:1.5; }
+    .admin-fields { display:grid; grid-template-columns:minmax(100px,.35fr) 1fr auto auto; gap:10px; }.admin-fields input { min-width:0; padding:11px 12px; border:1.5px solid var(--border); border-radius:var(--r-sm); background:var(--cream); font: .9rem "Inter",sans-serif; outline:none; }.admin-fields input:focus { border-color:var(--saffron); background:white; }
+    .chant-modal { position:fixed; inset:0; z-index:500; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(28,10,0,.58); }.chant-modal.show { display:flex; }.chant-dialog { position:relative; width:min(420px,100%); padding:30px 28px; border:1px solid var(--border); border-radius:22px; background:linear-gradient(135deg,#FFFDF9,#FFF1DF); box-shadow:0 16px 46px rgba(28,10,0,.42); text-align:center; }.chant-close { position:absolute; top:12px; right:14px; border:0; background:transparent; color:var(--text-light); font-size:1.7rem; line-height:1; cursor:pointer; }.chant-title { padding-right:24px; font:700 1.45rem/1.45 "Tiro Devanagari Marathi",serif; color:var(--text-dark); }.chant-text { margin:12px 0 20px; color:var(--text-mid); font:.92rem/1.55 "Tiro Devanagari Marathi",serif; }.chant-counter { --progress:0%; width:174px; aspect-ratio:1; margin:0 auto 14px; padding:10px; border:0; border-radius:50%; cursor:pointer; background:conic-gradient(var(--saffron-dark) var(--progress), var(--saffron-light) var(--progress) 100%); box-shadow:0 4px 14px rgba(194,83,10,.25); }.chant-counter:hover { transform:scale(1.025); }.chant-counter:focus-visible { outline:3px solid var(--text-dark); outline-offset:4px; }.chant-counter-inner { display:flex; align-items:center; justify-content:center; width:100%; height:100%; border-radius:50%; background:#FFF8EF; box-shadow:inset 0 0 0 1px var(--border); color:var(--text-dark); font:700 1.35rem "Inter",sans-serif; }.chant-sub-count { min-height:20px; margin-bottom:8px; color:var(--saffron-dark); font:700 .88rem "Inter",sans-serif; }.chant-help { color:var(--text-light); font-size:.83rem; }
+    @media (max-width:600px) { .poll-body { padding:20px 14px 30px; }.poll-tabs { gap:4px; padding:4px; }.poll-tab { padding:10px 4px; font-size:.72rem; }.question-card,.admin-card { padding:20px 18px; }.admin-fields { grid-template-columns:1fr; }.admin-fields .btn { width:100%; }.answer-options.compact-options { grid-template-columns:1fr; }.vishesh-option { gap:10px; align-items:flex-start; }.vishesh-select { gap:10px; }.id-chip { max-width:125px; }.option-actions { flex-direction:column; }.nitya-option { gap:7px; }.nitya-option .chant-btn { padding:7px 8px; }.chant-dialog { padding:26px 22px; }.chant-title { font-size:1.08rem; line-height:1.4; }.chant-text { font-size:.78rem; line-height:1.45; margin:10px 0 16px; }.chant-counter { width:150px; }.chant-counter-inner { font-size:1.18rem; } }
   </style>
 </head>
 <body>
   <div class="top-bar">
     <button class="icon-btn" onclick="history.back()">← मागे</button>
     <span class="top-bar-title">श्री स्वामी समर्थ</span>
-    <div class="user-chip">
-      <div class="avatar" id="userAvatar">?</div>
-      <span class="user-chip-name" id="userName">...</span>
-    </div>
+    <div class="user-chip"><div class="avatar" id="userAvatar">?</div><span class="user-chip-name" id="userName">...</span></div>
   </div>
 
-  <div class="poll-body">
-    <div class="question-list" id="questionList"></div>
-
-    <div class="submit-wrap">
-      <button class="btn btn-primary" id="submitBtn" disabled>Submit</button>
-    </div>
-  </div>
+  <main class="poll-body">
+    <nav class="poll-tabs" aria-label="Seva sections">
+      <button class="poll-tab active" type="button" data-tab="seva">Nitya Seva</button>
+      <button class="poll-tab" type="button" data-tab="parents_namaskar">Namaskar</button>
+      <button class="poll-tab" type="button" data-tab="vishesh_seva">Vishesh Seva</button>
+    </nav>
+    <section class="question-card" id="questionCard"></section>
+    <section class="admin-card" id="adminCard" hidden>
+      <h2>Add Vishesh Seva option</h2><p>Admins can add a unique option ID and its text. It will immediately appear in the Vishesh Seva poll for everyone.</p>
+      <div class="admin-fields"><input id="optionId" maxlength="40" placeholder="Option ID (e.g. VS1)"/><input id="optionLabel" maxlength="300" placeholder="Option text"/><button class="btn btn-primary btn-sm" id="addOptionBtn" type="button">Add option</button><button class="btn btn-ghost btn-sm" id="cancelEditBtn" type="button" hidden>Cancel</button></div>
+    </section>
+    <div class="submit-wrap"><button class="btn btn-primary" id="submitBtn" disabled>Submit</button></div>
+  </main>
 
   <div class="toast" id="toast"></div>
+  <div class="chant-modal" id="chantModal" aria-hidden="true">
+    <div class="chant-dialog" role="dialog" aria-modal="true" aria-labelledby="chantTitle">
+      <button class="chant-close" id="chantClose" type="button" aria-label="Close">×</button>
+      <div class="chant-title" id="chantTitle"></div>
+      <div class="chant-text" id="chantText"></div>
+      <button class="chant-counter" id="chantCounter" type="button" aria-label="Increase chant count"><span class="chant-counter-inner" id="chantCountText">0 / 0</span></button>
+      <div class="chant-sub-count" id="chantSubCount" hidden></div>
+      <div class="chant-help" id="chantHelp">Tap the circle to increase count</div>
+    </div>
+  </div>
   <script src="config.js"></script>
   <script type="module">
-    import { saveResponse } from "./firebase-client.js";
+    import { addVisheshSevaOption, deleteVisheshSevaOption, getVisheshSevaOptions, saveResponse, updateVisheshSevaOption } from "./firebase-client.js";
 
-    const answers = {};
     const student = sessionStorage.getItem("currentStudent");
     if (!student) window.location.href = "index.html";
+    const questions = CONFIG.POLL_QUESTIONS.filter(question => question.id === "seva" || question.id === "parents_namaskar");
+    const answers = {};
+    let visheshOptions = [];
+    let selectedVisheshIds = new Set();
+    let editingOptionId = null;
+    const chantCounts = new Map();
+    const nityaChantProgress = new Map();
+    let activeChantOption = null;
+    let activeChantMode = null;
+    let activeTab = new URLSearchParams(window.location.search).get("tab") === "vishesh_seva" ? "vishesh_seva" : "seva";
+    const card = document.getElementById("questionCard");
+    const submitBtn = document.getElementById("submitBtn");
 
-    const initials = student
-      .split(" ")
-      .filter(Boolean)
-      .map(namePart => namePart.charAt(0).toUpperCase())
-      .join("")
-      .slice(0, 2);
-
+    const initials = student.split(" ").filter(Boolean).map(part => part[0].toUpperCase()).join("").slice(0, 2);
     document.getElementById("userName").textContent = initials;
     document.getElementById("userAvatar").textContent = initials.charAt(0) || "?";
-    document.getElementById("submitBtn").addEventListener("click", submitResponse);
+    updateAdminCard();
+    document.querySelectorAll(".poll-tab").forEach(tab => {
+      tab.classList.toggle("active", tab.dataset.tab === activeTab);
+      tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+    });
+    submitBtn.addEventListener("click", submitResponse);
+    document.getElementById("addOptionBtn").addEventListener("click", addOption);
+    document.getElementById("cancelEditBtn").addEventListener("click", resetOptionForm);
+    document.getElementById("chantClose").addEventListener("click", closeChantModal);
+    document.getElementById("chantModal").addEventListener("click", event => { if (event.target === event.currentTarget) closeChantModal(); });
+    document.getElementById("chantCounter").addEventListener("click", increaseChantCount);
+    document.getElementById("optionLabel").addEventListener("keydown", event => { if (event.key === "Enter") addOption(); });
 
-    renderQuestions();
+    await loadVisheshOptions();
+    renderActiveTab();
+    updateSubmitState();
 
-    function renderQuestions() {
-      const list = document.getElementById("questionList");
-      list.innerHTML = "";
-
-      CONFIG.POLL_QUESTIONS.forEach(question => {
-        const card = document.createElement("div");
-        card.className = "question-card";
-        card.dataset.questionId = question.id;
-        card.innerHTML = `
-          <div class="question-head">
-            <div class="question-copy">
-              <div class="q-label">${question.title}</div>
-              <div class="q-text">${formatQuestion(question.text)}</div>
-            </div>
-            <div class="answer-pill" data-answer-pill="${question.id}"></div>
-          </div>
-          <div class="answer-options ${question.options.length === 2 ? "compact-options" : ""}">
-            ${question.options.map(option => `
-              <button class="yes-no-btn ${option.id === "E" ? "option-e" : ""}" type="button" data-question-id="${question.id}" data-option-id="${option.id}">
-                ${option.id.length === 1 ? `<span class="option-circle">${option.id}</span>` : ""}
-                <span class="option-label">${option.label}</span>
-              </button>
-            `).join("")}
-          </div>
-        `;
-
-        card.addEventListener("click", event => {
-          if (!event.target.closest(".yes-no-btn")) {
-            openQuestion(question.id);
-          }
-        });
-
-        card.querySelectorAll(".yes-no-btn").forEach(button => {
-          button.addEventListener("click", event => {
-            event.stopPropagation();
-            selectAnswer(button.dataset.questionId, button.dataset.optionId);
-          });
-        });
-
-        list.appendChild(card);
-      });
-
-      setActiveQuestion(CONFIG.POLL_QUESTIONS[0].id);
-      updateCardLocks();
+    async function loadVisheshOptions() {
+      try { visheshOptions = await getVisheshSevaOptions(); }
+      catch (error) { showToast("Vishesh Seva options could not be loaded", "error"); }
     }
 
-    function setActiveQuestion(questionId) {
-      document.querySelectorAll(".question-card").forEach(card => {
-        card.classList.toggle("active", card.dataset.questionId === questionId);
-      });
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll(".poll-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === tabId));
+      updateAdminCard();
+      renderActiveTab();
     }
 
-    function openQuestion(questionId) {
-      if (!canOpenQuestion(questionId)) {
-        showToast("आधी पहिल्या प्रश्नाचे उत्तर निवडा", "info");
+    function updateAdminCard() {
+      document.getElementById("adminCard").hidden = true;
+    }
+
+    function renderActiveTab() {
+      if (activeTab === "vishesh_seva") return renderVisheshSeva();
+      const question = questions.find(item => item.id === activeTab);
+      const selected = answers[question.id]?.id;
+      const nityaChantButton = question.id === "seva" ? `<button class="chant-btn" type="button" data-nitya-chant>Chant</button>` : "";
+      card.innerHTML = `<div class="q-label">${escapeHTML(question.title)}</div><div class="q-heading"><div class="q-text">${escapeHTML(formatQuestion(question.text))}</div>${nityaChantButton}</div><div class="answer-options ${question.options.length === 2 ? "compact-options" : ""}">${question.options.map(option => `<button class="option-btn ${selected === option.id ? "selected" : ""}" type="button" data-option-id="${escapeHTML(option.id)}">${option.id.length === 1 ? `<span class="option-badge">${escapeHTML(option.id)}</span>` : ""}<span>${escapeHTML(option.label)}</span></button>`).join("")}</div>`;
+      card.querySelectorAll(".option-btn").forEach(button => button.addEventListener("click", () => {
+        answers[question.id] = question.options.find(option => option.id === button.dataset.optionId);
+        renderActiveTab(); updateSubmitState();
+      }));
+      card.querySelectorAll("[data-nitya-chant]").forEach(button => button.addEventListener("click", openNityaChant));
+    }
+
+    function renderVisheshSeva() {
+      const adminActions = isAdmin();
+      card.innerHTML = `<div class="q-label">Today's poll</div><div class="q-text">Vishesh Seva</div>${visheshOptions.length ? `<div class="answer-options">${visheshOptions.map(option => `<div class="vishesh-option ${selectedVisheshIds.has(option.id) ? "selected" : ""}"><button class="vishesh-select" type="button" data-option-id="${escapeHTML(option.id)}"><span class="check">${selectedVisheshIds.has(option.id) ? "✓" : ""}</span>${adminActions ? `<span class="id-chip" title="${escapeHTML(option.id)}">${escapeHTML(option.id)}</span>` : ""}<span class="vishesh-text">${escapeHTML(option.label)}</span></button>${isMantraOption(option) ? `<button class="chant-btn" type="button" data-chant-id="${escapeHTML(option.id)}">Chant</button>` : ""}${adminActions ? `<div class="option-actions"><button class="option-action" type="button" data-edit-id="${escapeHTML(option.id)}">Edit</button><button class="option-action delete" type="button" data-delete-id="${escapeHTML(option.id)}">Delete</button></div>` : ""}</div>`).join("")}</div>` : `<div class="empty">No Vishesh Seva options have been added yet.</div>`}`;
+      card.querySelectorAll(".vishesh-select").forEach(button => button.addEventListener("click", () => {
+        const id = button.dataset.optionId;
+        selectedVisheshIds.has(id) ? selectedVisheshIds.delete(id) : selectedVisheshIds.add(id);
+        renderVisheshSeva(); updateSubmitState();
+      }));
+      card.querySelectorAll("[data-edit-id]").forEach(button => button.addEventListener("click", () => beginEdit(button.dataset.editId)));
+      card.querySelectorAll("[data-delete-id]").forEach(button => button.addEventListener("click", () => deleteOption(button.dataset.deleteId)));
+      card.querySelectorAll("[data-chant-id]").forEach(button => button.addEventListener("click", () => openChantModal(button.dataset.chantId)));
+    }
+
+    function updateSubmitState() {
+      const hasBaseAnswer = questions.some(question => answers[question.id]);
+      const hasVisheshAnswer = selectedVisheshIds.size > 0;
+      submitBtn.disabled = !hasBaseAnswer && !hasVisheshAnswer;
+    }
+
+    async function addOption() {
+      const idInput = document.getElementById("optionId"), labelInput = document.getElementById("optionLabel");
+      try {
+        if (editingOptionId) {
+          await updateVisheshSevaOption(editingOptionId, idInput.value, labelInput.value);
+          selectedVisheshIds.delete(editingOptionId);
+          showToast("✓ Vishesh Seva option updated");
+        } else {
+          await addVisheshSevaOption(idInput.value, labelInput.value);
+          showToast("✓ Vishesh Seva option added");
+        }
+        resetOptionForm();
+        await loadVisheshOptions();
+        if (activeTab === "vishesh_seva") renderVisheshSeva();
+        updateSubmitState();
+      } catch (error) { showToast(error.message || "Option could not be added", "error"); }
+    }
+
+    function beginEdit(id) {
+      const option = visheshOptions.find(item => item.id === id);
+      if (!option) return;
+      editingOptionId = id;
+      document.getElementById("optionId").value = option.id;
+      document.getElementById("optionLabel").value = option.label;
+      document.getElementById("addOptionBtn").textContent = "Save changes";
+      document.getElementById("cancelEditBtn").hidden = false;
+      document.getElementById("optionId").focus();
+      document.getElementById("adminCard").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function resetOptionForm() {
+      editingOptionId = null;
+      document.getElementById("optionId").value = "";
+      document.getElementById("optionLabel").value = "";
+      document.getElementById("addOptionBtn").textContent = "Add option";
+      document.getElementById("cancelEditBtn").hidden = true;
+    }
+
+    async function deleteOption(id) {
+      const option = visheshOptions.find(item => item.id === id);
+      if (!option || !window.confirm(`Delete the Vishesh Seva option "${option.id}"?`)) return;
+      try {
+        await deleteVisheshSevaOption(id);
+        selectedVisheshIds.delete(id);
+        if (editingOptionId === id) resetOptionForm();
+        await loadVisheshOptions();
+        renderVisheshSeva(); updateSubmitState();
+        showToast("✓ Vishesh Seva option deleted");
+      } catch (error) { showToast(error.message || "Option could not be deleted", "error"); }
+    }
+
+    function isMantraOption(option) { return option.id.toUpperCase().includes("MANTRA"); }
+
+    function getIntendedCount(option) {
+      const match = option.label.match(/\(([^)]*?)\)/);
+      const value = match ? match[1].trim() : "";
+      const normalized = value.replace(/./g, character => {
+        const code = character.charCodeAt(0);
+        return code >= 0x0966 && code <= 0x096F ? String(code - 0x0966) : character;
+      });
+      return Number.parseInt(normalized, 10) || 0;
+    }
+
+    function getChantTitle(option) { return option.label.split("|")[0].replace(/\([^)]*\)/g, "").trim(); }
+
+    function openChantModal(id) {
+      const option = visheshOptions.find(item => item.id === id);
+      if (!option) return;
+      const intendedCount = getIntendedCount(option);
+      if (!intendedCount) {
+        showToast("Add the intended count in brackets, e.g. (11 वेळा)", "error");
         return;
       }
-      setActiveQuestion(questionId);
+      activeChantOption = option;
+      activeChantMode = "vishesh";
+      document.getElementById("chantModal").classList.add("show");
+      document.getElementById("chantModal").setAttribute("aria-hidden", "false");
+      document.getElementById("chantTitle").textContent = getChantTitle(option);
+      document.getElementById("chantText").textContent = option.label.includes("|") ? option.label.split("|").slice(1).join("|").trim() : "";
+      updateChantModal();
     }
 
-    function canOpenQuestion(questionId) {
-      const questionIndex = CONFIG.POLL_QUESTIONS.findIndex(question => question.id === questionId);
-      return CONFIG.POLL_QUESTIONS
-        .slice(0, questionIndex)
-        .every(question => answers[question.id]);
+    function openNityaChant() {
+      activeChantOption = { id: "nitya_seva_chant" };
+      activeChantMode = "nitya";
+      document.getElementById("chantModal").classList.add("show");
+      document.getElementById("chantModal").setAttribute("aria-hidden", "false");
+      document.getElementById("chantTitle").textContent = "Shri Swami Samarth Mantra Chant";
+      document.getElementById("chantText").textContent = "Complete 108 chants to finish one mala.";
+      updateChantModal();
     }
 
-    function updateCardLocks() {
-      CONFIG.POLL_QUESTIONS.forEach(question => {
-        const card = document.querySelector(`.question-card[data-question-id="${question.id}"]`);
-        card.classList.toggle("locked", !canOpenQuestion(question.id));
-      });
+    function closeChantModal() {
+      activeChantOption = null;
+      activeChantMode = null;
+      document.getElementById("chantModal").classList.remove("show");
+      document.getElementById("chantModal").setAttribute("aria-hidden", "true");
     }
 
-    function selectAnswer(questionId, optionId) {
-      if (!canOpenQuestion(questionId)) return;
+    function updateChantModal() {
+      if (!activeChantOption) return;
+      const isNityaChant = activeChantMode === "nitya" || activeChantOption.id === "nitya_seva_chant";
+      const intendedCount = isNityaChant ? 108 : getIntendedCount(activeChantOption);
+      const nityaProgress = nityaChantProgress.get(activeChantOption.id) || { count: 0, malas: 0 };
+      const currentCount = isNityaChant ? nityaProgress.count : (chantCounts.get(activeChantOption.id) || 0);
+      const targetCount = isNityaChant ? 108 : intendedCount;
+      const progress = Math.min(100, (currentCount / targetCount) * 100);
+      document.getElementById("chantCounter").style.setProperty("--progress", `${progress}%`);
+      document.getElementById("chantCountText").textContent = `${currentCount} / ${targetCount}`;
+      const subCount = document.getElementById("chantSubCount");
+      subCount.hidden = !isNityaChant;
+      subCount.textContent = isNityaChant ? `Mala count: ${nityaProgress.malas} / 11` : "";
+      document.getElementById("chantHelp").textContent = isNityaChant ? "Tap the circle to chant. Every 108 chants completes one mala." : (currentCount >= intendedCount ? "Completed" : "Tap the circle to increase count");
+    }
 
-      const question = CONFIG.POLL_QUESTIONS.find(entry => entry.id === questionId);
-      const option = question.options.find(entry => entry.id === optionId);
-      answers[questionId] = option;
-
-      const card = document.querySelector(`.question-card[data-question-id="${questionId}"]`);
-      card.classList.add("answered");
-      card.querySelectorAll(".yes-no-btn").forEach(button => {
-        button.classList.toggle("selected", button.dataset.optionId === optionId);
-      });
-      document.querySelector(`[data-answer-pill="${questionId}"]`).textContent = option.label;
-
-      const nextQuestion = CONFIG.POLL_QUESTIONS.find(question => !answers[question.id]);
-      if (nextQuestion) {
-        setActiveQuestion(nextQuestion.id);
-      } else {
-        setActiveQuestion(null);
+    function increaseChantCount() {
+      if (!activeChantOption) return;
+      const option = activeChantOption;
+      if (activeChantMode === "nitya" || option.id === "nitya_seva_chant") {
+        const progress = nityaChantProgress.get(option.id) || { count: 0, malas: 0 };
+        const nextCount = progress.count + 1;
+        if (nextCount < 108) {
+          nityaChantProgress.set(option.id, { ...progress, count: nextCount });
+          updateChantModal();
+          return;
+        }
+        const nextMalas = progress.malas + 1;
+        nityaChantProgress.set(option.id, { count: nextMalas === 11 ? 108 : 0, malas: nextMalas });
+        if (nextMalas === 11) {
+          showToast("✓ 11 malas completed");
+          setTimeout(closeChantModal, 450);
+        } else {
+          updateChantModal();
+          showToast(`✓ Mala ${nextMalas} of 11 completed`);
+        }
+        return;
       }
-
-      updateCardLocks();
-      document.getElementById("submitBtn").disabled = CONFIG.POLL_QUESTIONS.some(question => !answers[question.id]);
-    }
-
-    function formatQuestion(text) {
-      return text.replace("{date}", getTodayDisplay());
+      const intendedCount = getIntendedCount(option);
+      const currentCount = chantCounts.get(option.id) || 0;
+      if (currentCount >= intendedCount) return;
+      const nextCount = currentCount + 1;
+      chantCounts.set(option.id, nextCount);
+      updateChantModal();
+      if (nextCount === intendedCount) {
+        selectedVisheshIds.add(option.id);
+        renderVisheshSeva();
+        updateSubmitState();
+        showToast("✓ Chant completed and option selected");
+        setTimeout(closeChantModal, 450);
+      }
     }
 
     async function submitResponse() {
-      if (CONFIG.POLL_QUESTIONS.some(question => !answers[question.id])) return;
-
-      const btn = document.getElementById("submitBtn");
-      btn.disabled = true;
-
-      const responseAnswers = CONFIG.POLL_QUESTIONS.map(question => ({
-        questionId: question.id,
-        questionTitle: question.title,
-        question: formatQuestion(question.text),
-        selectedOption: answers[question.id].id,
-        optionText: answers[question.id].label
-      }));
-
-      const sevaAnswer = responseAnswers.find(answer => answer.questionId === "seva") || responseAnswers[0];
-      const payload = {
-        date: getTodayISO(),
-        studentName: student,
-        question: sevaAnswer.question,
-        selectedOption: sevaAnswer.selectedOption,
-        optionText: sevaAnswer.optionText,
-        answers: responseAnswers
-      };
-
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true;
+      const responseAnswers = questions
+        .filter(question => answers[question.id])
+        .map(question => ({ questionId:question.id, questionTitle:question.title, question:formatQuestion(question.text), selectedOption:answers[question.id].id, optionText:answers[question.id].label }));
+      responseAnswers.push({ questionId:"vishesh_seva", selectedOptionIds:[...selectedVisheshIds] });
+      const sevaAnswer = responseAnswers.find(answer => answer.questionId === "seva");
       try {
-        await saveResponse(payload);
+        await saveResponse({ date:getTodayISO(), studentName:student, question:sevaAnswer?.question || "", selectedOption:sevaAnswer?.selectedOption || "", optionText:sevaAnswer?.optionText || "", answers:responseAnswers });
         showToast("✓ आपले उत्तर नोंदवले गेले!");
-        setTimeout(() => {
-          window.location.href = "daily.html";
-        }, 900);
-      } catch (error) {
-        btn.disabled = false;
-        showToast(error.message || "उत्तर जतन झाले नाही", "error");
-      }
+        setTimeout(() => { window.location.href = "daily.html"; }, 900);
+      } catch (error) { updateSubmitState(); showToast(error.message || "उत्तर जतन झाले नाही", "error"); }
     }
+
+    function formatQuestion(text) { return text.replace("{date}", getTodayDisplay()); }
+    function escapeHTML(value) { const node = document.createElement("div"); node.textContent = value; return node.innerHTML; }
   </script>
 </body>
 </html>
