@@ -6,8 +6,54 @@
   <title>Add Vishesh Seva</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    body { display:flex; flex-direction:column; min-height:100vh; }.page { width:min(760px,100%); margin:0 auto; padding:28px 20px 42px; }.form-card,.list-card { position:relative; overflow:hidden; padding:24px; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--white); box-shadow:var(--shadow); }.form-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,var(--saffron),var(--saffron-dark)); }.form-card h1 { color:var(--text-dark); font-size:1.1rem; margin-bottom:6px; }.form-card p { color:var(--text-light); font-size:.85rem; line-height:1.55; margin-bottom:18px; }.form-card .field { margin-bottom:12px; }.form-card .btn { width:100%; }.list-card { margin-top:18px; padding:0; }.list-head { display:flex; align-items:center; justify-content:space-between; padding:17px 20px; border-bottom:1px solid var(--border); }.list-head h2 { color:var(--text-mid); font-size:1rem; }.list-count { color:var(--text-light); font-size:.8rem; }.option-row { display:grid; grid-template-columns:minmax(145px,.32fr) 1fr; gap:16px; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); }.option-row:last-child { border-bottom:0; }.option-id { width:max-content; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:6px 9px; border:1px solid var(--saffron-light); border-radius:7px; background:var(--saffron-bg); color:var(--saffron-dark); font-size:.75rem; font-weight:800; }.option-text { font-family:"Tiro Devanagari Marathi",serif; line-height:1.5; }.empty,.denied { padding:50px 20px; text-align:center; color:var(--text-light); }.denied { color:var(--danger); }
-    @media (max-width:550px) { .page { padding:20px 14px 32px; }.form-card { padding:22px 18px; }.option-row { grid-template-columns:1fr; gap:8px; padding:14px; }.option-id { max-width:100%; } }
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .page { width:min(760px,100%); margin:0 auto; padding:28px 20px 42px; }
+    .form-card,.list-card { position:relative; overflow:hidden; padding:24px; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--white); box-shadow:var(--shadow); }
+    .form-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,var(--saffron),var(--saffron-dark)); }
+    .form-card h1 { color:var(--text-dark); font-size:1.1rem; margin-bottom:6px; }
+    .form-card p { color:var(--text-light); font-size:.85rem; line-height:1.55; margin-bottom:18px; }
+    .form-card .field { margin-bottom:12px; }
+    .form-card .btn { width:100%; }
+    .form-actions { display:flex; gap:10px; }
+    .form-actions .btn { flex:1; }
+    .list-card { margin-top:18px; padding:0; }
+    .list-head { display:flex; align-items:center; justify-content:space-between; padding:17px 20px; border-bottom:1px solid var(--border); }
+    .list-head h2 { color:var(--text-mid); font-size:1rem; }
+    .list-count { color:var(--text-light); font-size:.8rem; }
+    .option-row { display:grid; grid-template-columns:minmax(145px,.32fr) 1fr auto; gap:16px; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); transition:background-color .15s; }
+    .option-row:last-child { border-bottom:0; }
+    .option-row.is-inactive { background:#FAF8F5; }
+    .option-row.is-inactive .option-id { opacity:.8; border-color:#E2E8F0; background:#F1F5F9; color:#64748B; }
+    .option-row.is-inactive .option-text { color:var(--text-light); }
+    .option-id { width:max-content; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:6px 9px; border:1px solid var(--saffron-light); border-radius:7px; background:var(--saffron-bg); color:var(--saffron-dark); font-size:.75rem; font-weight:800; }
+    .option-text { font-family:"Tiro Devanagari Marathi",serif; line-height:1.5; }
+    .option-actions { display:flex; align-items:center; gap:8px; }
+    .option-action { border:1px solid var(--border); border-radius:8px; padding:7px 11px; background:white; color:var(--text-light); font:700 .74rem "Inter",sans-serif; cursor:pointer; transition:all .15s; }
+    .option-action:hover { border-color:var(--saffron-light); color:var(--saffron); background:var(--saffron-bg); }
+    .status-select-wrap { position:relative; display:inline-flex; align-items:center; }
+    .status-select { appearance:none; -webkit-appearance:none; -moz-appearance:none; padding:7px 26px 7px 11px; border-radius:8px; font:700 .74rem "Inter",sans-serif; cursor:pointer; outline:none; transition:all .16s; background-repeat:no-repeat; background-position:right 8px center; background-size:9px 6px; }
+    .status-select.is-active { border:1.5px solid #86EFAC; background-color:#F0FDF4; color:#15803D; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2315803D' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); }
+    .status-select.is-active:hover { border-color:#22C55E; background-color:#DCFCE7; }
+    .status-select.is-inactive { border:1.5px solid #FECACA; background-color:#FEF2F2; color:#DC2626; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23DC2626' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); }
+    .status-select.is-inactive:hover { border-color:#EF4444; background-color:#FEE2E2; }
+    .empty,.denied { padding:50px 20px; text-align:center; color:var(--text-light); }
+    .denied { color:var(--danger); }
+    .modal { position:fixed; inset:0; z-index:500; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(28,10,0,.5); }
+    .modal.show { display:flex; }
+    .modal-card { width:min(400px,100%); padding:24px; border:1px solid var(--border); border-radius:var(--r-lg); background:white; box-shadow:var(--shadow-lg); }
+    .modal-card h2 { color:var(--text-dark); font-size:1.08rem; margin-bottom:8px; }
+    .modal-card p { color:var(--text-light); font-size:.85rem; line-height:1.5; }
+    .modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+    .btn-danger { background:var(--danger); color:white; }
+    @media (max-width:550px) {
+      .page { padding:20px 14px 32px; }
+      .form-card { padding:22px 18px; }
+      .option-row { grid-template-columns:1fr auto; gap:8px; padding:14px; }
+      .option-text { grid-column:1 / -1; }
+      .option-actions { grid-column:2; grid-row:1; }
+      .option-id { max-width:100%; }
+      .form-actions { flex-direction:column; }
+    }
   </style>
 </head>
 <body>
@@ -15,21 +61,219 @@
   <main class="page">
     <section id="denied" class="denied" hidden>Only administrators can manage Vishesh Seva options.</section>
     <div id="content" hidden>
-      <section class="form-card"><h1>Add Vishesh Seva option</h1><p>Enter a unique option ID and its text. It will immediately appear in the Vishesh Seva poll for everyone.</p><div class="field"><input id="optionId" maxlength="40" placeholder="Option ID (e.g. VS1)"/></div><div class="field"><input id="optionLabel" maxlength="300" placeholder="Option text"/></div><button class="btn btn-primary" id="addBtn" type="button">Add option</button></section>
-      <section class="list-card"><div class="list-head"><h2>Available Vishesh Seva options</h2><span class="list-count" id="optionCount">0 options</span></div><div id="optionList"></div></section>
+      <section class="form-card">
+        <h1 id="formTitle">Add Vishesh Seva option</h1>
+        <p id="formHelp">Enter a unique option ID and its text. It will immediately appear in the Vishesh Seva poll for everyone.</p>
+        <div class="field"><input id="optionId" maxlength="40" placeholder="Option ID (e.g. VS1)"/></div>
+        <div class="field"><input id="optionLabel" maxlength="300" placeholder="Option text"/></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="addBtn" type="button">Add option</button>
+          <button class="btn btn-ghost" id="cancelEditBtn" type="button" hidden>Cancel</button>
+        </div>
+      </section>
+      <section class="list-card">
+        <div class="list-head">
+          <h2>Available Vishesh Seva options</h2>
+          <span class="list-count" id="optionCount">0 options</span>
+        </div>
+        <div id="optionList"></div>
+      </section>
     </div>
   </main>
+
+  <div class="modal" id="statusModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
+      <h2 id="statusModalTitle">Change Status</h2>
+      <p id="statusModalText">Are you sure you want to change the status?</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" id="cancelStatusBtn" type="button">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="confirmStatusBtn" type="button">Yes, Change</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
   <script src="config.js"></script>
   <script type="module">
-    import { addVisheshSevaOption, getVisheshSevaOptions } from "./firebase-client.js";
+    import { addVisheshSevaOption, getVisheshSevaOptions, updateVisheshSevaOption, updateVisheshSevaOptionStatus } from "./firebase-client.js";
+
+    let options = [];
+    let editingOptionId = null;
+    let pendingStatusChange = null;
+
+    const statusModal = document.getElementById("statusModal");
+    const cancelStatusBtn = document.getElementById("cancelStatusBtn");
+    const confirmStatusBtn = document.getElementById("confirmStatusBtn");
+
     document.getElementById("addBtn").addEventListener("click", addOption);
-    document.getElementById("optionLabel").addEventListener("keydown", event => { if (event.key === "Enter") addOption(); });
-    if (!isAdmin()) document.getElementById("denied").hidden = false;
-    else { document.getElementById("content").hidden = false; loadOptions(); }
-    async function addOption() { const button = document.getElementById("addBtn"); button.disabled = true; try { await addVisheshSevaOption(document.getElementById("optionId").value, document.getElementById("optionLabel").value); document.getElementById("optionId").value = ""; document.getElementById("optionLabel").value = ""; await loadOptions(); showToast("✓ Vishesh Seva option added"); } catch (error) { showToast(error.message || "Option could not be added", "error"); } finally { button.disabled = false; } }
-    async function loadOptions() { try { const options = await getVisheshSevaOptions(); document.getElementById("optionCount").textContent = `${options.length} option${options.length === 1 ? "" : "s"}`; document.getElementById("optionList").innerHTML = options.length ? options.map(option => `<div class="option-row"><span class="option-id">${escapeHTML(option.id)}</span><span class="option-text">${escapeHTML(option.label)}</span></div>`).join("") : '<div class="empty">No Vishesh Seva options yet.</div>'; } catch (error) { showToast(error.message || "Options could not be loaded", "error"); } }
-    function escapeHTML(value) { const node = document.createElement("div"); node.textContent = value; return node.innerHTML; }
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
+    cancelStatusBtn.addEventListener("click", cancelStatusChange);
+    confirmStatusBtn.addEventListener("click", confirmStatusChange);
+
+    statusModal.addEventListener("click", event => {
+      if (event.target === statusModal) cancelStatusChange();
+    });
+
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape" && statusModal.classList.contains("show")) {
+        cancelStatusChange();
+      }
+    });
+
+    document.getElementById("optionLabel").addEventListener("keydown", event => {
+      if (event.key === "Enter") addOption();
+    });
+
+    if (!isAdmin()) {
+      document.getElementById("denied").hidden = false;
+    } else {
+      document.getElementById("content").hidden = false;
+      loadOptions();
+    }
+
+    async function addOption() {
+      const button = document.getElementById("addBtn");
+      button.disabled = true;
+      try {
+        if (editingOptionId) {
+          await updateVisheshSevaOption(editingOptionId, document.getElementById("optionId").value, document.getElementById("optionLabel").value);
+          showToast("✓ Vishesh Seva option updated");
+        } else {
+          await addVisheshSevaOption(document.getElementById("optionId").value, document.getElementById("optionLabel").value);
+          showToast("✓ Vishesh Seva option added");
+        }
+        resetForm();
+        await loadOptions();
+      } catch (error) {
+        showToast(error.message || "Option could not be saved", "error");
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function loadOptions() {
+      try {
+        options = await getVisheshSevaOptions();
+        document.getElementById("optionCount").textContent = `${options.length} option${options.length === 1 ? "" : "s"}`;
+        const list = document.getElementById("optionList");
+        list.innerHTML = options.length ? options.map(option => {
+          const isInactive = option.status === "inactive";
+          return `
+            <div class="option-row ${isInactive ? "is-inactive" : ""}">
+              <span class="option-id">${escapeHTML(option.id)}</span>
+              <span class="option-text">${escapeHTML(option.label)}</span>
+              <span class="option-actions">
+                <button class="option-action" type="button" data-edit="${escapeHTML(option.id)}">Edit</button>
+                <div class="status-select-wrap">
+                  <select class="status-select ${isInactive ? "is-inactive" : "is-active"}" data-status-id="${escapeHTML(option.id)}" data-current-status="${isInactive ? "inactive" : "active"}" aria-label="Status for ${escapeHTML(option.id)}">
+                    <option value="active" ${!isInactive ? "selected" : ""}>Active</option>
+                    <option value="inactive" ${isInactive ? "selected" : ""}>Inactive</option>
+                  </select>
+                </div>
+              </span>
+            </div>
+          `;
+        }).join("") : '<div class="empty">No Vishesh Seva options yet.</div>';
+
+        list.querySelectorAll("[data-edit]").forEach(button => {
+          button.addEventListener("click", () => beginEdit(button.dataset.edit));
+        });
+
+        list.querySelectorAll(".status-select").forEach(select => {
+          select.addEventListener("change", (e) => promptStatusChange(e, select.dataset.statusId));
+        });
+      } catch (error) {
+        showToast(error.message || "Options could not be loaded", "error");
+      }
+    }
+
+    function beginEdit(id) {
+      const option = options.find(item => item.id === id);
+      if (!option) return;
+      editingOptionId = id;
+      document.getElementById("optionId").value = option.id;
+      document.getElementById("optionLabel").value = option.label;
+      document.getElementById("formTitle").textContent = "Edit Vishesh Seva option";
+      document.getElementById("formHelp").textContent = "Update the option ID or text, then save your changes.";
+      document.getElementById("addBtn").textContent = "Save changes";
+      document.getElementById("cancelEditBtn").hidden = false;
+      document.getElementById("optionId").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetForm() {
+      editingOptionId = null;
+      document.getElementById("optionId").value = "";
+      document.getElementById("optionLabel").value = "";
+      document.getElementById("formTitle").textContent = "Add Vishesh Seva option";
+      document.getElementById("formHelp").textContent = "Enter a unique option ID and its text. It will immediately appear in the Vishesh Seva poll for everyone.";
+      document.getElementById("addBtn").textContent = "Add option";
+      document.getElementById("cancelEditBtn").hidden = true;
+    }
+
+    function promptStatusChange(event, id) {
+      const select = event.target;
+      const newStatus = select.value;
+      const currentStatus = select.dataset.currentStatus || "active";
+
+      if (newStatus === currentStatus) return;
+
+      const option = options.find(item => item.id === id);
+      if (!option) return;
+
+      pendingStatusChange = {
+        id,
+        newStatus,
+        prevStatus: currentStatus,
+        selectElement: select
+      };
+
+      const targetText = newStatus === "active" ? "active" : "inactive";
+      document.getElementById("statusModalTitle").textContent = `Make ${newStatus === "active" ? "Active" : "Inactive"}?`;
+      document.getElementById("statusModalText").textContent = `Are you sure you want to make "${option.label || option.id}" ${targetText}?`;
+
+      confirmStatusBtn.textContent = `Yes, make ${targetText}`;
+      confirmStatusBtn.className = newStatus === "active" ? "btn btn-primary btn-sm" : "btn btn-danger btn-sm";
+
+      statusModal.classList.add("show");
+      statusModal.setAttribute("aria-hidden", "false");
+    }
+
+    function cancelStatusChange() {
+      if (pendingStatusChange && pendingStatusChange.selectElement) {
+        pendingStatusChange.selectElement.value = pendingStatusChange.prevStatus;
+      }
+      pendingStatusChange = null;
+      statusModal.classList.remove("show");
+      statusModal.setAttribute("aria-hidden", "true");
+    }
+
+    async function confirmStatusChange() {
+      if (!pendingStatusChange) return;
+      const { id, newStatus } = pendingStatusChange;
+      confirmStatusBtn.disabled = true;
+      try {
+        await updateVisheshSevaOptionStatus(id, newStatus);
+        statusModal.classList.remove("show");
+        statusModal.setAttribute("aria-hidden", "true");
+        pendingStatusChange = null;
+        await loadOptions();
+        showToast(`✓ Option status updated to ${newStatus}`);
+      } catch (error) {
+        showToast(error.message || "Status could not be updated", "error");
+        if (pendingStatusChange && pendingStatusChange.selectElement) {
+          pendingStatusChange.selectElement.value = pendingStatusChange.prevStatus;
+        }
+      } finally {
+        confirmStatusBtn.disabled = false;
+      }
+    }
+
+    function escapeHTML(value) {
+      const node = document.createElement("div");
+      node.textContent = value;
+      return node.innerHTML;
+    }
   </script>
 </body>
 </html>

@@ -194,6 +194,10 @@ export async function getVisheshSevaOptions() {
   const options = Array.isArray(meta.visheshSevaOptions) ? meta.visheshSevaOptions : [];
   return options
     .filter(option => option && typeof option.id === "string" && typeof option.label === "string")
+    .map(option => ({
+      ...option,
+      status: option.status === "inactive" ? "inactive" : "active"
+    }))
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -209,7 +213,7 @@ export async function addVisheshSevaOption(id, label) {
   }
 
   await setDoc(doc(db, META_COLLECTION, META_DOC), {
-    visheshSevaOptions: [...options, { id: optionId, label: optionLabel }]
+    visheshSevaOptions: [...options, { id: optionId, label: optionLabel, status: "active" }]
   }, { merge: true });
 }
 
@@ -227,7 +231,27 @@ export async function updateVisheshSevaOption(currentId, id, label) {
   }
 
   await setDoc(doc(db, META_COLLECTION, META_DOC), {
-    visheshSevaOptions: options.map(option => option.id === oldId ? { id: optionId, label: optionLabel } : option)
+    visheshSevaOptions: options.map(option => option.id === oldId ? {
+      ...option,
+      id: optionId,
+      label: optionLabel,
+      status: option.status === "inactive" ? "inactive" : "active"
+    } : option)
+  }, { merge: true });
+}
+
+export async function updateVisheshSevaOptionStatus(id, status) {
+  const optionId = id.trim();
+  const nextStatus = status === "inactive" ? "inactive" : "active";
+  const meta = await ensureMetadataDoc();
+  const options = Array.isArray(meta.visheshSevaOptions) ? meta.visheshSevaOptions : [];
+  if (!options.some(option => option?.id === optionId)) throw new Error("Option no longer exists");
+
+  await setDoc(doc(db, META_COLLECTION, META_DOC), {
+    visheshSevaOptions: options.map(option => option.id === optionId ? {
+      ...option,
+      status: nextStatus
+    } : option)
   }, { merge: true });
 }
 

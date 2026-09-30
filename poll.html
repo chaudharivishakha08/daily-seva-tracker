@@ -76,7 +76,7 @@
   </div>
   <script src="config.js"></script>
   <script type="module">
-    import { addVisheshSevaOption, deleteVisheshSevaOption, getVisheshSevaOptions, saveResponse, updateVisheshSevaOption } from "./firebase-client.js";
+    import { addVisheshSevaOption, getVisheshSevaOptions, saveResponse, updateVisheshSevaOption } from "./firebase-client.js";
 
     const student = sessionStorage.getItem("currentStudent");
     if (!student) window.location.href = "index.html";
@@ -114,7 +114,10 @@
     updateSubmitState();
 
     async function loadVisheshOptions() {
-      try { visheshOptions = await getVisheshSevaOptions(); }
+      try {
+        const all = await getVisheshSevaOptions();
+        visheshOptions = all.filter(option => (option.status || "active") === "active");
+      }
       catch (error) { showToast("Vishesh Seva options could not be loaded", "error"); }
     }
 
@@ -144,14 +147,14 @@
 
     function renderVisheshSeva() {
       const adminActions = isAdmin();
-      card.innerHTML = `<div class="q-label">Today's poll</div><div class="q-text">Vishesh Seva</div>${visheshOptions.length ? `<div class="answer-options">${visheshOptions.map(option => `<div class="vishesh-option ${selectedVisheshIds.has(option.id) ? "selected" : ""}"><button class="vishesh-select" type="button" data-option-id="${escapeHTML(option.id)}"><span class="check">${selectedVisheshIds.has(option.id) ? "✓" : ""}</span>${adminActions ? `<span class="id-chip" title="${escapeHTML(option.id)}">${escapeHTML(option.id)}</span>` : ""}<span class="vishesh-text">${escapeHTML(option.label)}</span></button>${isMantraOption(option) ? `<button class="chant-btn" type="button" data-chant-id="${escapeHTML(option.id)}">Chant</button>` : ""}${adminActions ? `<div class="option-actions"><button class="option-action" type="button" data-edit-id="${escapeHTML(option.id)}">Edit</button><button class="option-action delete" type="button" data-delete-id="${escapeHTML(option.id)}">Delete</button></div>` : ""}</div>`).join("")}</div>` : `<div class="empty">No Vishesh Seva options have been added yet.</div>`}`;
+      card.innerHTML = `<div class="q-label">Today's poll</div><div class="q-text">Vishesh Seva</div>${visheshOptions.length ? `<div class="answer-options">${visheshOptions.map(option => `<div class="vishesh-option ${selectedVisheshIds.has(option.id) ? "selected" : ""}"><button class="vishesh-select" type="button" data-option-id="${escapeHTML(option.id)}"><span class="check">${selectedVisheshIds.has(option.id) ? "✓" : ""}</span>${adminActions ? `<span class="id-chip" title="${escapeHTML(option.id)}">${escapeHTML(option.id)}</span>` : ""}<span class="vishesh-text">${escapeHTML(option.label)}</span></button>${isMantraOption(option) ? `<button class="chant-btn" type="button" data-chant-id="${escapeHTML(option.id)}">Chant</button>` : ""}</div>`).join("")}</div>` : `<div class="empty">No active Vishesh Seva options available today.</div>`}`;
       card.querySelectorAll(".vishesh-select").forEach(button => button.addEventListener("click", () => {
         const id = button.dataset.optionId;
         selectedVisheshIds.has(id) ? selectedVisheshIds.delete(id) : selectedVisheshIds.add(id);
         renderVisheshSeva(); updateSubmitState();
       }));
-      card.querySelectorAll("[data-edit-id]").forEach(button => button.addEventListener("click", () => beginEdit(button.dataset.editId)));
-      card.querySelectorAll("[data-delete-id]").forEach(button => button.addEventListener("click", () => deleteOption(button.dataset.deleteId)));
+
+
       card.querySelectorAll("[data-chant-id]").forEach(button => button.addEventListener("click", () => openChantModal(button.dataset.chantId)));
     }
 
@@ -199,18 +202,18 @@
       document.getElementById("cancelEditBtn").hidden = true;
     }
 
-    async function deleteOption(id) {
-      const option = visheshOptions.find(item => item.id === id);
-      if (!option || !window.confirm(`Delete the Vishesh Seva option "${option.id}"?`)) return;
-      try {
-        await deleteVisheshSevaOption(id);
-        selectedVisheshIds.delete(id);
-        if (editingOptionId === id) resetOptionForm();
-        await loadVisheshOptions();
-        renderVisheshSeva(); updateSubmitState();
-        showToast("✓ Vishesh Seva option deleted");
-      } catch (error) { showToast(error.message || "Option could not be deleted", "error"); }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     function isMantraOption(option) { return option.id.toUpperCase().includes("MANTRA"); }
 
